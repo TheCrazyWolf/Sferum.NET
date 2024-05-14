@@ -1,13 +1,23 @@
 using SferumSharp.Models.Request;
+using SferumSharp.Scenario;
+using SferumSharp.Scenario.Base;
 
 namespace SferumSharp.Services;
 
-public class Worker : BackgroundService
+public class SferumWorker : BackgroundService
 {
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<SferumWorker> _logger;
     private readonly VkFactory _vkFactory;
 
-    public Worker(ILogger<Worker> logger, VkFactory vkFactory)
+    private readonly IReadOnlyCollection<IScenario> _scenarios = new List<IScenario>
+    {
+        new WelcomeScenario(2000000001),
+        new WelcomeScenario(2000000002),
+        new WelcomeScenario(2000000042),
+        new WelcomeScenario(2000000098),
+    };
+    
+    public SferumWorker(ILogger<SferumWorker> logger, VkFactory vkFactory) 
     {
         _logger = logger;
         _vkFactory = vkFactory;
@@ -26,14 +36,11 @@ public class Worker : BackgroundService
             if(accounts.Last().expires <= DateTime.Now.Ticks)
                 accounts = await _vkFactory.GetAccounts();
 
-            var messageParams = new MessageParams()
+            foreach (var currentScenario in _scenarios)
             {
-                PeerID = "2000000001",
-                Token = accounts.Last().access_token,
-                Message = "Добрый вечер"
-            };
-
-            await _vkFactory.MessageSend(messageParams);
+                await currentScenario.Handle(_vkFactory, accounts.Last());
+                await Task.Delay(1000, stoppingToken);
+            }
 
             await Task.Delay(1000, stoppingToken);
         }
