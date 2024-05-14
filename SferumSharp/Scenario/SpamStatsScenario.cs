@@ -17,7 +17,6 @@ public class SpamStatsScenario : IScenario
         "Доброе утро! \ud83d\ude03 Пусть сегодня будет день, когда исполняются мечты! \ud83c\udf1f", 
     };
     
-
     public SpamStatsScenario(long chatId)
     {
         _chatId = chatId;

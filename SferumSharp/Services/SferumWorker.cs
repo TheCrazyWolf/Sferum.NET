@@ -1,3 +1,4 @@
+using SamGK_Api.Interfaces.Client;
 using SferumSharp.Scenario;
 using SferumSharp.Scenario.Base;
 
@@ -10,12 +11,22 @@ public class SferumWorker : BackgroundService
 
     private readonly IReadOnlyCollection<IScenario> _scenarios = new List<IScenario>
     {
-        /*new WelcomeScenario(2000000001),
-        new WelcomeScenario(2000000002),
-        new WelcomeScenario(2000000042),
-        new WelcomeScenario(2000000098),*/
-        new WelcomeScenario(2000000132),
-        new SpamStatsScenario(2000000132)
+        /* Сценарии одноразового приветствия */
+        new WelcomeScenario(2000000001), // Учительская
+        new WelcomeScenario(2000000063), // Учительская (2)
+        new WelcomeScenario(2000000002), // ИС-21-01
+        new WelcomeScenario(2000000042), // ИС-23-01
+        new WelcomeScenario(2000000098), // ИС-21-06
+        new WelcomeScenario(2000000132), // ИС-22-02 УП (тест)
+        
+        /* Сценарий отправки расписания */
+        new SheduleScenario(2000000002,"254", SheduleSearchType.Group), // ИС-21-01
+        new SheduleScenario(2000000042,"351", SheduleSearchType.Group), // ИС-23-01
+        new SheduleScenario(2000000098,"259", SheduleSearchType.Group), // ИС-21-06
+        new SheduleScenario(2000000043,"361", SheduleSearchType.Group), // ИС-23-02
+        
+        /* Сценарий спама */
+        new SpamStatsScenario(2000000132) // ИС-22-02 УП (тест)
     };
     
     public SferumWorker(ILogger<SferumWorker> logger, VkFactory vkFactory) 

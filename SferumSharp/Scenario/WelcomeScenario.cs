@@ -54,9 +54,13 @@ public class WelcomeScenario : IScenario
         if(DateTime.Today == _lastWelcomed.Date)
             return;
         
-        if(DateTime.Now.Hour <= 9 && DateTime.Now.Hour >= 22)
-            return;
-        
+        switch (DateTime.Now.Hour)
+        {
+            case <= 7:
+            case >= 17:
+                return;
+        }
+
         var messageParams = new MessageParams
         {
             PeerID = _chatId,
