@@ -1,4 +1,3 @@
-using SferumSharp.Models.Request;
 using SferumSharp.Scenario;
 using SferumSharp.Scenario.Base;
 
@@ -11,10 +10,11 @@ public class SferumWorker : BackgroundService
 
     private readonly IReadOnlyCollection<IScenario> _scenarios = new List<IScenario>
     {
-        new WelcomeScenario(2000000001),
+        /*new WelcomeScenario(2000000001),
         new WelcomeScenario(2000000002),
         new WelcomeScenario(2000000042),
-        new WelcomeScenario(2000000098),
+        new WelcomeScenario(2000000098),*/
+        new WelcomeScenario(2000000132),
     };
     
     public SferumWorker(ILogger<SferumWorker> logger, VkFactory vkFactory) 
@@ -38,8 +38,9 @@ public class SferumWorker : BackgroundService
 
             foreach (var currentScenario in _scenarios)
             {
+                _logger.LogInformation($"[{DateTimeOffset.Now}] Task {currentScenario.GetType().FullName} started");
                 await currentScenario.Handle(_vkFactory, accounts.Last());
-                await Task.Delay(1000, stoppingToken);
+                await Task.Delay(1500, stoppingToken);
             }
 
             await Task.Delay(1000, stoppingToken);

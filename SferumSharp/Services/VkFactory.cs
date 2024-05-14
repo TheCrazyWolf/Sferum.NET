@@ -28,7 +28,7 @@ public class VkFactory(IConfiguration configuration)
 
     public async Task MessageSend(MessageParams messageParams)
     {
-        var request = new RestRequest($"https://api.vk.com/method/messages.sen2d?access_token={messageParams.Token}&peer_id={messageParams.PeerID}&message={messageParams.Message}&random_id={new Random().Next()}&v=5.226");
+        var request = new RestRequest($"https://api.vk.com/method/messages.send?access_token={messageParams.Token}&peer_id={messageParams.PeerID}&message={messageParams.Message}&random_id={new Random().Next()}&v=5.226");
         
         var responce = await _restSharp.ExecuteAsync(request);
     }
