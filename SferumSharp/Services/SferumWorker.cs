@@ -1,3 +1,4 @@
+using SamGK_Api.Interfaces.Client;
 using SferumSharp.Scenario;
 using SferumSharp.Scenario.Base;
 
@@ -15,6 +16,7 @@ public class SferumWorker : BackgroundService
         new WelcomeScenario(2000000042),
         new WelcomeScenario(2000000098),*/
         new WelcomeScenario(2000000132),
+        new SheduleScenario(2000000132, "308", SheduleSearchType.Group)
     };
     
     public SferumWorker(ILogger<SferumWorker> logger, VkFactory vkFactory) 
