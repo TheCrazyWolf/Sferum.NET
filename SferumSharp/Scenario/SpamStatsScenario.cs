@@ -46,7 +46,7 @@ public class SpamStatsScenario : IScenario
     private string ShuffleWords(string sentence)
     {
         List<string> words = sentence.Split(' ').ToList();
-        words = words.OrderBy(x => Guid.NewGuid()).ToList(); // Перемешивание слов
+        words = words.OrderBy(x => Guid.NewGuid()).ToList(); 
         return string.Join(" ", words);
     }
     

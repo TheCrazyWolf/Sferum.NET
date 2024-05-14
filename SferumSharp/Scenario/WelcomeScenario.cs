@@ -8,7 +8,7 @@ namespace SferumSharp.Scenario;
 public class WelcomeScenario : IScenario
 {
     private DateTime _lastWelcomed = DateTime.MinValue;
-    private readonly long _peerId;
+    private readonly long _chatId;
 
     private readonly IList<string> _welcomeArray = new List<string>()
     {
@@ -46,7 +46,7 @@ public class WelcomeScenario : IScenario
 
     public WelcomeScenario(long chatId)
     {
-        _peerId = chatId;
+        _chatId = chatId;
     }
     
     public async Task Handle(VkFactory vkFactory, ResponceAccount currentAccount)
@@ -59,7 +59,7 @@ public class WelcomeScenario : IScenario
         
         var messageParams = new MessageParams
         {
-            PeerID = _peerId,
+            PeerID = _chatId,
             Message = _welcomeArray[new Random().Next(0, _welcomeArray.Count)],
             Token = currentAccount.access_token
         };

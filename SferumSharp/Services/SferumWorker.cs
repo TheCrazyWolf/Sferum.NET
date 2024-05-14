@@ -1,4 +1,3 @@
-using SamGK_Api.Interfaces.Client;
 using SferumSharp.Scenario;
 using SferumSharp.Scenario.Base;
 
@@ -41,7 +40,14 @@ public class SferumWorker : BackgroundService
             foreach (var currentScenario in _scenarios)
             {
                 _logger.LogInformation($"[{DateTimeOffset.Now}] Task {currentScenario.GetType().FullName} started");
-                await currentScenario.Handle(_vkFactory, accounts.Last());
+                try
+                {
+                    await currentScenario.Handle(_vkFactory, accounts.Last());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
                 await Task.Delay(1200, stoppingToken);
             }
 
