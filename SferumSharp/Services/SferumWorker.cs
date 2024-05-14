@@ -47,6 +47,7 @@ public class SferumWorker : BackgroundService
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
+                    accounts = await _vkFactory.GetAccounts();
                 }
                 await Task.Delay(1200, stoppingToken);
             }

@@ -14,18 +14,24 @@ public class VkFactory(IConfiguration configuration)
 
     public async Task<IReadOnlyList<ResponceAccount>> GetAccounts()
     {
-        _remixdsid = UpdateRemixSid();
+        try
+        {
+            _remixdsid = UpdateRemixSid();
 
-        var request = new RestRequest("https://web.vk.me/?act=web_token&app_id=8202606");
-        request.AddCookie("remixdsid", _remixdsid, "/", "web.vk.me");
+            var request = new RestRequest("https://web.vk.me/?act=web_token&app_id=8202606");
+            request.AddCookie("remixdsid", _remixdsid, "/", "web.vk.me");
 
-        var responce = await _restSharp.ExecuteAsync(request);
-
-        if (!responce.IsSuccessStatusCode)
-            throw new Exception("Failed to getAccounts");
-
-        return JsonConvert.DeserializeObject<IReadOnlyList<ResponceAccount>>(responce.Content ?? string.Empty) ??
-               new List<ResponceAccount>();
+            var responce = await _restSharp.ExecuteAsync(request);
+            
+            return JsonConvert.DeserializeObject<IReadOnlyList<ResponceAccount>>(responce.Content ?? string.Empty) ??
+                   new List<ResponceAccount>();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        
+        return new List<ResponceAccount>();
     }
 
     public async Task MessageSend(MessageParams messageParams)
