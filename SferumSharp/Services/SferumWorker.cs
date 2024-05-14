@@ -16,7 +16,7 @@ public class SferumWorker : BackgroundService
         new WelcomeScenario(2000000042),
         new WelcomeScenario(2000000098),*/
         new WelcomeScenario(2000000132),
-        new SheduleScenario(2000000132, "308", SheduleSearchType.Group)
+        new SpamStatsScenario(2000000132)
     };
     
     public SferumWorker(ILogger<SferumWorker> logger, VkFactory vkFactory) 
@@ -42,10 +42,10 @@ public class SferumWorker : BackgroundService
             {
                 _logger.LogInformation($"[{DateTimeOffset.Now}] Task {currentScenario.GetType().FullName} started");
                 await currentScenario.Handle(_vkFactory, accounts.Last());
-                await Task.Delay(1500, stoppingToken);
+                await Task.Delay(1200, stoppingToken);
             }
 
-            await Task.Delay(1000, stoppingToken);
+            await Task.Delay(5000, stoppingToken);
         }
     }
 }

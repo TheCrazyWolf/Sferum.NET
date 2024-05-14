@@ -13,7 +13,7 @@ public class SheduleScenario : IScenario
     private readonly long _chatId;
     private readonly string _idValue;
     private SheduleSearchType _type;
-    private DateTime _lastWelcomed = DateTime.MinValue;
+    private DateTime _lastSended = DateTime.MinValue;
     private ClientSamgk _samgk = new ClientSamgk();
 
     public SheduleScenario(long chatId, string id, SheduleSearchType type)
@@ -26,7 +26,7 @@ public class SheduleScenario : IScenario
 
     public async Task Handle(VkFactory vkFactory, ResponceAccount currentAccount)
     {
-        if (DateTime.Today == _lastWelcomed.Date)
+        if (DateTime.Today == _lastSended.Date)
             return;
 
         if (DateTime.Now.Hour <= 9 && DateTime.Now.Hour >= 22)
@@ -52,7 +52,7 @@ public class SheduleScenario : IScenario
             await Task.Delay(1000);
         }
 
-        _lastWelcomed = DateTime.Now;
+        _lastSended = DateTime.Now;
     }
 
     private string ExtractShedule(IEnumerable<IScheduleDate>? schedule)
