@@ -17,6 +17,7 @@ public class SferumWorker : BackgroundService
         new WelcomeScenario(2000000002), // ИС-21-01
         new WelcomeScenario(2000000042), // ИС-23-01
         new WelcomeScenario(2000000098), // ИС-21-06
+        new WelcomeScenario(2000000043), // ИС-23-02
         new WelcomeScenario(2000000132), // ИС-22-02 УП (тест)
 
         /* Сценарий отправки расписания */
