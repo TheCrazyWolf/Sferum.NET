@@ -74,7 +74,7 @@ public class WelcomeScenario : IScenario
         var randomMessage = _welcomeArray[new Random().Next(_welcomeArray.Count)];
         return new MessageParams
         {
-            PeerID = _chatId,
+            ChatId = _chatId,
             Message = randomMessage,
             Token = currentAccountVkMe.access_token
         };

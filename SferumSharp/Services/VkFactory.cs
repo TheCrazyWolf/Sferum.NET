@@ -39,7 +39,7 @@ public class VkFactory(IConfiguration configuration)
         var request = new RestRequest($"https://api.vk.com/method/messages.send");
 
         request.AddParameter("access_token", messageParams.Token);
-        request.AddParameter("peer_id", messageParams.PeerID);
+        request.AddParameter("peer_id", messageParams.ChatId);
         request.AddParameter("message", messageParams.Message);
         request.AddParameter("random_id", new Random().Next());
         request.AddParameter("v", "5.226");

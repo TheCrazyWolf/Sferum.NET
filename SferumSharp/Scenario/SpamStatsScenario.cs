@@ -26,7 +26,7 @@ public class SpamStatsScenario : IScenario
     {
         var messageParams = new MessageParams
         {
-            PeerID = _chatId,
+            ChatId = _chatId,
             Message = $"{ShuffleWords(GetRandomSentence())} => {Guid.NewGuid()}" ,
             Token = currentAccountVkMe.access_token
         };

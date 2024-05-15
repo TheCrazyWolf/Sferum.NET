@@ -51,13 +51,14 @@ public class SferumWorker : BackgroundService
             foreach (var currentScenario in _scenarios)
             {
                 _logger.LogInformation($"[{DateTimeOffset.Now}] Task {currentScenario.GetType().FullName} started");
+                
                 try
                 {
                     await currentScenario.Handle(_vkFactory, accounts.Last());
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    _logger.LogCritical(e.ToString());
                     accounts = await _vkFactory.GetAccounts();
                 }
 

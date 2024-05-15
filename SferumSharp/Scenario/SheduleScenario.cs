@@ -68,7 +68,7 @@ public class SheduleScenario : IScenario
     {
         return new MessageParams
         {
-            PeerID = _chatId,
+            ChatId = _chatId,
             Message = ExtractSchedule(schedule),
             Token = currentAccountVkMe.access_token
         };
