@@ -22,13 +22,13 @@ public class SpamStatsScenario : IScenario
         _chatId = chatId;
     }
     
-    public async Task Handle(VkFactory vkFactory, ResponceAccount currentAccount)
+    public async Task Handle(VkFactory vkFactory, AccountVkMe currentAccountVkMe)
     {
         var messageParams = new MessageParams
         {
             PeerID = _chatId,
             Message = $"{ShuffleWords(GetRandomSentence())} => {Guid.NewGuid()}" ,
-            Token = currentAccount.access_token
+            Token = currentAccountVkMe.access_token
         };
         
         await vkFactory.MessageSend(messageParams);

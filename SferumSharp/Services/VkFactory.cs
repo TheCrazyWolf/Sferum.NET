@@ -12,7 +12,7 @@ public class VkFactory(IConfiguration configuration)
 
     private string _remixdsid = string.Empty;
 
-    public async Task<IReadOnlyList<ResponceAccount>> GetAccounts()
+    public async Task<IReadOnlyList<AccountVkMe>> GetAccounts()
     {
         try
         {
@@ -23,15 +23,15 @@ public class VkFactory(IConfiguration configuration)
 
             var responce = await _restSharp.ExecuteAsync(request);
             
-            return JsonConvert.DeserializeObject<IReadOnlyList<ResponceAccount>>(responce.Content ?? string.Empty) ??
-                   new List<ResponceAccount>();
+            return JsonConvert.DeserializeObject<IReadOnlyList<AccountVkMe>>(responce.Content ?? string.Empty) ??
+                   new List<AccountVkMe>();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
         
-        return new List<ResponceAccount>();
+        return new List<AccountVkMe>();
     }
 
     public async Task MessageSend(MessageParams messageParams)

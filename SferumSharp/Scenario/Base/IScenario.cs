@@ -5,5 +5,11 @@ namespace SferumSharp.Scenario.Base;
 
 public interface IScenario
 {
-    public Task Handle(VkFactory vkFactory, ResponceAccount currentAccount);
+    /// <summary>
+    /// Вызов события
+    /// </summary>
+    /// <param name="vkFactory">Экземпляр сервиса API VK</param>
+    /// <param name="currentAccountVkMe">Текущий аккаунт</param>
+    /// <returns></returns>
+    public Task Handle(VkFactory vkFactory, AccountVkMe currentAccountVkMe);
 }

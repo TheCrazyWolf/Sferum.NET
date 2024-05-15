@@ -1,4 +1,5 @@
-﻿using SamGK_Api;
+﻿using System.Text;
+using SamGK_Api;
 using SamGK_Api.Interfaces.Client;
 using SamGK_Api.Interfaces.Schedule;
 using SferumSharp.Models.Request;
@@ -10,11 +11,13 @@ namespace SferumSharp.Scenario;
 
 public class SheduleScenario : IScenario
 {
+    private const int MorningHour = 7;
+    private const int EveningHour = 17;
     private readonly long _chatId;
     private readonly string _idValue;
     private SheduleSearchType _type;
     private DateTime _lastSended = DateTime.MinValue;
-    private ClientSamgk _samgk = new ClientSamgk();
+    private ClientSamgk _samgk = new();
 
     public SheduleScenario(long chatId, string id, SheduleSearchType type)
     {
@@ -24,34 +27,18 @@ public class SheduleScenario : IScenario
     }
 
 
-    public async Task Handle(VkFactory vkFactory, ResponceAccount currentAccount)
+    public async Task Handle(VkFactory vkFactory, AccountVkMe currentAccountVkMe)
     {
-        if (DateTime.Today == _lastSended.Date)
+        if (ShouldSkipSending())
             return;
 
-        switch (DateTime.Now.Hour)
-        {
-            case <= 7:
-            case >= 17:
-                return;
-        }
-
-        IEnumerable<DateOnly> dates = new List<DateOnly>()
-        {
-            DateOnly.FromDateTime(DateTime.Now), DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
-        };
-
+        var dates = GetScheduleDates();
 
         foreach (var date in dates)
         {
-            var messageParams = new MessageParams
-            {
-                PeerID = _chatId,
-                Message = ExtractShedule(
-                    await _samgk.Sсhedule.GetScheduleAsync(date, _type, _idValue)),
-                Token = currentAccount.access_token
-            };
-
+            var schedule = await _samgk.Sсhedule.GetScheduleAsync(date, _type, _idValue);
+            var messageParams = CreateMessageParams(currentAccountVkMe, schedule);
+            
             await vkFactory.MessageSend(messageParams);
             await Task.Delay(1000);
         }
@@ -59,23 +46,50 @@ public class SheduleScenario : IScenario
         _lastSended = DateTime.Now;
     }
 
-    private string ExtractShedule(IEnumerable<IScheduleDate>? schedule)
+    private bool ShouldSkipSending()
+    {
+        if (DateTime.Today == _lastSended.Date)
+            return true;
+
+        var currentHour = DateTime.Now.Hour;
+        return currentHour <= MorningHour || currentHour >= EveningHour;
+    }
+
+    private IEnumerable<DateOnly> GetScheduleDates()
+    {
+        return new List<DateOnly>
+        {
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
+    }
+
+    private MessageParams CreateMessageParams(AccountVkMe currentAccountVkMe, IEnumerable<IScheduleDate>? schedule)
+    {
+        return new MessageParams
+        {
+            PeerID = _chatId,
+            Message = ExtractSchedule(schedule),
+            Token = currentAccountVkMe.access_token
+        };
+    }
+
+    private string ExtractSchedule(IEnumerable<IScheduleDate>? schedule)
     {
         if (schedule is null)
-            return "Ошибка при получение расписания";
+            return "Ошибка при получении расписания";
 
-        string msg = "";
+        var msg = new StringBuilder();
 
         foreach (var scheduleDate in schedule)
         {
-            msg += $"Расписание на {scheduleDate.Date}\n";
-
+            msg.AppendLine($"Расписание на {scheduleDate.Date}");
             foreach (var lesson in scheduleDate.Lessons)
             {
-                msg += $"# {lesson.Num} - {lesson.Title} ауд. № {lesson.Cab}\n";
+                msg.AppendLine($"# {lesson.Num} - {lesson.Title} ауд. № {lesson.Cab}");
             }
         }
 
-        return msg;
+        return msg.ToString();
     }
 }
