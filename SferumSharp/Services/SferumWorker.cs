@@ -18,18 +18,18 @@ public class SferumWorker : BackgroundService
         new WelcomeScenario(2000000042), // ИС-23-01
         new WelcomeScenario(2000000098), // ИС-21-06
         new WelcomeScenario(2000000132), // ИС-22-02 УП (тест)
-        
+
         /* Сценарий отправки расписания */
-        new SheduleScenario(2000000002,"254", SheduleSearchType.Group), // ИС-21-01
-        new SheduleScenario(2000000042,"351", SheduleSearchType.Group), // ИС-23-01
-        new SheduleScenario(2000000098,"259", SheduleSearchType.Group), // ИС-21-06
-        new SheduleScenario(2000000043,"361", SheduleSearchType.Group), // ИС-23-02
-        
+        new SheduleScenario(2000000002, "254", SheduleSearchType.Group), // ИС-21-01
+        new SheduleScenario(2000000042, "351", SheduleSearchType.Group), // ИС-23-01
+        new SheduleScenario(2000000098, "259", SheduleSearchType.Group), // ИС-21-06
+        new SheduleScenario(2000000043, "361", SheduleSearchType.Group), // ИС-23-02
+
         /* Сценарий спама */
         new SpamStatsScenario(2000000132) // ИС-22-02 УП (тест)
     };
-    
-    public SferumWorker(ILogger<SferumWorker> logger, VkFactory vkFactory) 
+
+    public SferumWorker(ILogger<SferumWorker> logger, VkFactory vkFactory)
     {
         _logger = logger;
         _vkFactory = vkFactory;
@@ -39,13 +39,13 @@ public class SferumWorker : BackgroundService
     {
         _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
         var accounts = await _vkFactory.GetAccounts();
-        
+
         while (!stoppingToken.IsCancellationRequested)
         {
             if (!accounts.Any())
                 accounts = await _vkFactory.GetAccounts();
-            
-            if(accounts.Last().expires <= DateTime.Now.Ticks)
+
+            if (accounts.Last().expires <= DateTime.Now.Ticks)
                 accounts = await _vkFactory.GetAccounts();
 
             foreach (var currentScenario in _scenarios)
@@ -60,10 +60,11 @@ public class SferumWorker : BackgroundService
                     Console.WriteLine(e);
                     accounts = await _vkFactory.GetAccounts();
                 }
+
                 await Task.Delay(1200, stoppingToken);
             }
 
-            await Task.Delay(5000, stoppingToken);
+            await Task.Delay(new Random().Next(3000, 15000), stoppingToken);
         }
     }
 }
