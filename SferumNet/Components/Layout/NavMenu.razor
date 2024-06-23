@@ -1,6 +1,28 @@
-﻿<MudNavMenu>
+﻿@using Microsoft.EntityFrameworkCore
+@using SferumNet.DbModels.Vk
+<MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
-    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Weather</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Новый профиль</MudNavLink>
+
+    @if (_profiles != null)
+    {
+        @foreach (var profile in _profiles)
+        {
+            <MudNavLink Href="profile" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">@profile.Name</MudNavLink>
+        }
+    }
 
 </MudNavMenu>
+
+@inject SferumNetContext Ef;
+
+@code {
+
+    private ICollection<VkProfile>? _profiles { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _profiles = await Ef.VkProfiles.ToListAsync();
+    }
+
+}
