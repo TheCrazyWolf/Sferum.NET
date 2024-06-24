@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SferumNet.DbModels.Common;
 using SferumNet.DbModels.Data;
 using SferumNet.DbModels.Scenarios;
 using SferumNet.DbModels.Services;
@@ -10,6 +11,7 @@ public class SferumNetContext : DbContext
 {
     public DbSet<VkProfile> VkProfiles { get; set; }
     public DbSet<WelcomeSentence> WelcomeSentences { get; set; }
+    public DbSet<Scenario> Scenarios { get; set; }
     public DbSet<Flood> ScenarioFloods { get; set; }
     public DbSet<Welcome> ScenarioWelcoms { get; set; }
     public DbSet<Schedule> Schedules { get; set; }
