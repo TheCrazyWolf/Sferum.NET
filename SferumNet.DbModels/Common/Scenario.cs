@@ -7,7 +7,7 @@ public class Scenario : Entity
 {
     [ForeignKey("IdProfile")]
     public VkProfile? VkProfile { get; set; }
-    public int? IdProfile { get; set; }
+    public long? IdProfile { get; set; }
     
     public string Title { get; set; }
     
