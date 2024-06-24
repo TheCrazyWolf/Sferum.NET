@@ -1,20 +1,27 @@
 ﻿@using Microsoft.EntityFrameworkCore
+@using SferumNet.Components.Pages.Components
 @using SferumNet.DbModels.Vk
 <MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Новый профиль</MudNavLink>
+    <MudNavLink OnClick="() => OpenAddProfile()" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Новый профиль</MudNavLink>
 
     @if (_profiles != null)
     {
-        @foreach (var profile in _profiles)
+        @foreach (var currentProfile in _profiles)
         {
-            <MudNavLink Href="profile" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">@profile.Name</MudNavLink>
+            var url = $"/profile?id={currentProfile.Id}";
+            <MudNavLink Href="@url" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">@currentProfile.Name</MudNavLink>
         }
+    }
+    else
+    {
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
     }
 
 </MudNavMenu>
 
 @inject SferumNetContext Ef;
+@inject IDialogService DialogService
 
 @code {
 
@@ -23,6 +30,12 @@
     protected override async Task OnInitializedAsync()
     {
         _profiles = await Ef.VkProfiles.ToListAsync();
+    }
+
+    private void OpenAddProfile()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogService.Show<ModalAddProfile>("Настройка профиля", options);
     }
 
 }

@@ -1,0 +1,45 @@
+﻿@using SferumNet.DbModels.Vk
+@using SferumNet.Services.Models
+
+<MudDialog>
+    <DialogContent>
+        @if (Accounts == null)
+        {
+            <MudAlert Severity="Severity.Error">Доступых профилей не найдено. Возможно вы доступили ошибку RemixSid или отсутствует соединение с ВК</MudAlert>
+        }
+        else
+        {
+            <MudRadioGroup @bind-Value="@_selectedAccount">
+                @foreach (var account in Accounts)
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="mt-2">
+                        <MudRadio T="ResponceProfileWebToken" Value="account" Color="Color.Primary">Аккаунт № @account.UserId </MudRadio>
+                    </MudAlert>
+                }
+            </MudRadioGroup>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Закрыть</MudButton>
+        @if (Accounts != null)
+        {
+            <MudButton Color="Color.Primary" OnClick="Submit">Выбрать</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public VkProfile Profile { get; set; } = new();
+
+    [Parameter] public ICollection<ResponceProfileWebToken>? Accounts { get; set; }
+    
+    private ResponceProfileWebToken _selectedAccount;
+
+    void Submit() => MudDialog.Close(_selectedAccount);
+    void Cancel() => MudDialog.Cancel();
+
+
+}

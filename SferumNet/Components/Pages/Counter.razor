@@ -1,4 +1,5 @@
 ﻿@page "/counter"
+@using SferumNet.Services
 
 <PageTitle>Counter</PageTitle>
 
@@ -12,6 +13,9 @@
     private void IncrementCount()
     {
         currentCount++;
+
+        VkFactory s = new VkFactory();
+        s.Authorize("+79967327736", "M54rti!_1FZA!xU");
     }
 
 }

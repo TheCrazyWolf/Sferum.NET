@@ -19,6 +19,8 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="MudBlazor" Version="6.*"/>
+        <PackageReference Include="RestSharp" Version="111.3.0" />
+        <PackageReference Include="VkNet" Version="1.78.0" />
     </ItemGroup>
 
 
