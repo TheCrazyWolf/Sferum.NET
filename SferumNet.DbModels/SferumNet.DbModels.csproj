@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="SamGK_Api" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>

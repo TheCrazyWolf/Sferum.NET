@@ -9,9 +9,17 @@ public class Scenario : Entity
     public VkProfile? VkProfile { get; set; }
     public int? IdProfile { get; set; }
     
+    public string Title { get; set; }
+    
     public TimeSpan TimeStart { get; set; }
     public TimeSpan TimeEnd { get; set; }
     public long IdConversation { get; set; }
     
-    public DateTime? LastExecuted { get; set; }
+    public DateTime LastExecuted { get; set; }
+    
+    public int TotalExecuted { get; set; }
+    public int MaxToExecute { get; set; }
+    public int Delay { get; set; }
+     
+    public bool IsActive { get; set; }
 }

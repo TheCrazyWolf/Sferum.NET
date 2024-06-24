@@ -20,12 +20,18 @@
         </PackageReference>
         <PackageReference Include="MudBlazor" Version="6.*"/>
         <PackageReference Include="RestSharp" Version="111.3.0" />
+        <PackageReference Include="SamGK_Api" Version="1.0.0" />
         <PackageReference Include="VkNet" Version="1.78.0" />
     </ItemGroup>
 
 
     <ItemGroup>
       <ProjectReference Include="..\SferumNet.DbModels\SferumNet.DbModels.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
     </ItemGroup>
 
 </Project>
