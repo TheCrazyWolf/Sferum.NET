@@ -1,13 +1,31 @@
 ﻿@page "/profile"
+@using SferumNet.Components.Pages.Components
+@using SferumNet.DbModels.Vk
 
-<PageTitle>Сценарии пользователя: </PageTitle>
+@inject IDialogService DialogService
+
+<PageTitle>Сценарии пользователя: @_currentProfile.Name</PageTitle>
 
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor and the .NET 8 Template!</MudText>
+<MudText Typo="Typo.h4" GutterBottom="true">Сценарии пользователя: @_currentProfile.Name</MudText>
+
+<MudPaper Elevation="25">
+    <MudToolBar>
+        <MudIconButton Icon="@Icons.Material.Outlined.Add"/>
+        <MudIconButton OnClick="() => OpenEditProfile()" Icon="@Icons.Material.Outlined.Edit"/>
+        <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit"/>
+    </MudToolBar>
+</MudPaper>
 
 @code {
 
     [Parameter] [SupplyParameterFromQuery] public int Id { get; set; }
+    private VkProfile _currentProfile = new VkProfile();
+
+    private async void OpenEditProfile()
+    {
+        var parameters = new DialogParameters<ModalAddProfile> { { "Profile", new VkProfile { Id = Id } } };
+        await DialogService.ShowAsync<ModalAddProfile>("Настройка профиля", parameters);
+    }
 
 }

@@ -16,7 +16,7 @@
         
         @if (Profile.Id != 0)
         {
-            <MudAlert Severity="Severity.Warning">В целях безопасности RemixSid скрыт. Если вы хотите изменить Remix удалите текущий профиль и повторите аутентификацию</MudAlert>
+            <MudAlert Class="mb-4" Severity="Severity.Warning">В целях безопасности RemixSid скрыт. Если вы хотите изменить Remix удалите текущий профиль и повторите аутентификацию</MudAlert>
         }
         else
         {
@@ -56,11 +56,10 @@
 
     private async void Create()
     {
-        var options = new DialogOptions();
         var factory = new VkFactory();
         var accounts = await factory.GetAccountsAsync(Profile.RemixSid);
         var parameters = new DialogParameters<ModalSelectAccount> { { "Accounts", accounts } };
-        var selectAccount = await DialogService.ShowAsync<ModalSelectAccount>("Выберите аккаунт", parameters, options);
+        var selectAccount = await DialogService.ShowAsync<ModalSelectAccount>("Выберите аккаунт", parameters);
         var resultDialog = await selectAccount.Result;
 
         if (resultDialog.Data == null)
@@ -84,6 +83,7 @@
     {
         Ef.Update(Profile);
         await Ef.SaveChangesAsync();
+        MudDialog.Close();
     }
     
 }
