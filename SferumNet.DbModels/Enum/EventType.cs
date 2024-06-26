@@ -3,5 +3,6 @@
 public enum EventType
 {
     Success,
-    Error
+    Error,
+    Info
 }
