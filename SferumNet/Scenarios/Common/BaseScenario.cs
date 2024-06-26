@@ -7,7 +7,7 @@ using VkNet;
 
 namespace SferumNet.Scenarios.Common;
 
-public class BaseSc : IScenario
+public class BaseScenario : IScenario<Scenario>
 {
     protected long _idScenario;
     protected CancellationToken _cancellationToken;
@@ -20,7 +20,7 @@ public class BaseSc : IScenario
     private VkApi _vkApi; 
     
     protected VkProfile? _currentProfileDb;
-    protected virtual Scenario? _currentScDb { get; set; }
+    protected Scenario? _currentScDb;
     
     public virtual Task ExecuteAsync(CancellationToken cancellationToken)
     {

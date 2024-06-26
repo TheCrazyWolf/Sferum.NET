@@ -4,7 +4,7 @@ using SferumNet.Scenarios.Common;
 
 namespace SferumNet.Scenarios;
 
-public class WelcomeSc : BaseSc
+public class WelcomeScenario : BaseScenario
 {
     public override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
