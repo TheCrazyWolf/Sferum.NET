@@ -43,6 +43,7 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
         DateTimeStarted = null;
 
         await _cancelTokenSource.CancelAsync();
+        _cancelTokenSource.Dispose();
     }
 
     public async Task RestartAsync()
