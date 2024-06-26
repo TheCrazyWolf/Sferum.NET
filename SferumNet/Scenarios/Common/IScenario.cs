@@ -4,4 +4,5 @@ public interface IScenario
 {
     Task ExecuteAsync(CancellationToken cancellationToken);
     bool CanBeExecuted();
+    Task ProcessAsync();
 }
