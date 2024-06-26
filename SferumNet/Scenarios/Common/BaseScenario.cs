@@ -4,52 +4,67 @@ using SferumNet.DbModels.Enum;
 using SferumNet.DbModels.Vk;
 using SferumNet.Services;
 using VkNet;
+using VkNet.Infrastructure;
+using VkNet.Model;
 
 namespace SferumNet.Scenarios.Common;
 
-public class BaseScenario : IScenario<Scenario>
+public class BaseScenario : IScenario
 {
-    protected long _idScenario;
-    protected CancellationToken _cancellationToken;
+    protected readonly long IdScenario;
+    protected CancellationToken CancellationToken;
     
     /* Services */
-    protected DbLogger _logger;
-    private VkFactory _vkFactory;
+    protected readonly DbLogger Logger;
+    private readonly VkFactory _vkFactory;
     
-    private SferumNetContext _ef;
-    private VkApi _vkApi; 
+    protected readonly SferumNetContext Ef;
+    protected readonly VkApi VkApi; 
     
     protected VkProfile? _currentProfileDb;
     protected Scenario? _currentScDb;
     
+    public BaseScenario(SferumNetContext ef, DbLogger dbLogger, long idScenario)
+    {
+        Ef = ef;
+        Logger = dbLogger;
+        IdScenario = idScenario;
+
+        VkApi = new VkApi();
+        _vkFactory = new VkFactory();
+    }
+    
     public virtual Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        CancellationToken = cancellationToken;
+        return Task.CompletedTask;
     }
 
     public virtual bool CanBeExecuted()
     {
-        throw new NotImplementedException();
+        return false;
     }
 
     public virtual Task ProcessAsync()
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     private async Task<VkProfile?> GetProfileAsync(long? idProfile)
     {
-        return await _ef.VkProfiles.FirstOrDefaultAsync(x => x.Id == idProfile, cancellationToken: _cancellationToken);
+        return await Ef.VkProfiles
+            .FirstOrDefaultAsync(x => x.Id == idProfile, cancellationToken: CancellationToken);
     }
 
     private async Task<Scenario?> GetScenarioAsync(long idSc)
     {
-        return await _ef.Scenarios.FirstOrDefaultAsync(x => x.Id == idSc, cancellationToken: _cancellationToken);
+        return await Ef.Scenarios
+            .FirstOrDefaultAsync(x => x.Id == idSc, cancellationToken: CancellationToken);
     }
 
     protected async Task UpdateProfileAndScAsync()
     {
-        _currentScDb = await GetScenarioAsync(_idScenario);
+        _currentScDb = await GetScenarioAsync(IdScenario);
 
         if (_currentScDb is null)
             return;
@@ -64,7 +79,9 @@ public class BaseScenario : IScenario<Scenario>
         
         if (_currentProfileDb.AccessTokenExpired <= DateTime.Now.Ticks)
         {
-            await _logger.LogAsync(_idScenario, EventType.Info, "Срок действия токена истек. Запрашиваем новый");
+            await ConfigureVkApiAsync();
+            
+            await Logger.LogAsync(IdScenario, EventType.Info, "Срок действия токена истек. Запрашиваем новый");
             
             var accounts = await _vkFactory.GetAccountsAsync(_currentProfileDb.RemixSid);
 
@@ -72,7 +89,7 @@ public class BaseScenario : IScenario<Scenario>
 
             if (webTokenAccount is null)
             {
-                await _logger.LogAsync(_idScenario, EventType.Error, "Не удалось обновить токен.");
+                await Logger.LogAsync(IdScenario, EventType.Error, "Не удалось обновить токен.");
                 return;
             }
 
@@ -80,22 +97,49 @@ public class BaseScenario : IScenario<Scenario>
             _currentProfileDb.UserId = webTokenAccount.UserId;
             _currentProfileDb.AccessToken = webTokenAccount.AccessToken;
 
-            _ef.Update(_currentProfileDb);
-            await _ef.SaveChangesAsync(_cancellationToken);
+            Ef.Update(_currentProfileDb);
+            await Ef.SaveChangesAsync(CancellationToken);
         }
     }
 
-    protected async Task ResetCounterExecutedIfNextdayAsync()
+    protected async Task ResetCounterExecutedIfNextDayAsync()
     {
         if(_currentScDb is null)
             return;
 
         if (_currentScDb.LastExecuted.Date != DateTime.Today.Date)
         {
-            await _logger.LogAsync(_idScenario, EventType.Info, "День прошел. Сбрасываем счётчик");
+            await Logger.LogAsync(IdScenario, EventType.Info, "День прошел. Сбрасываем счётчик");
             _currentScDb.TotalExecuted = 0;
-            _ef.Update(_currentScDb);
-            await _ef.SaveChangesAsync(_cancellationToken);
+            Ef.Update(_currentScDb);
+            await Ef.SaveChangesAsync(CancellationToken);
         }
+    }
+
+
+    protected async Task ProccessInrecementExecutedAsync()
+    {
+        if(_currentScDb is null)
+            return;
+        
+        _currentScDb.TotalExecuted++;
+        _currentScDb.LastExecuted = DateTime.Now;
+        Ef.Update(_currentScDb);
+        await Ef.SaveChangesAsync(CancellationToken);
+        
+        await Logger.LogAsync(IdScenario, EventType.Success, $"Сценарий успешно выполнен");
+    }
+
+    private async Task ConfigureVkApiAsync()
+    {
+        VkApi.VkApiVersion.SetVersion(5,226);
+
+        if (_currentProfileDb is null)
+            return;
+
+        await VkApi.AuthorizeAsync(new ApiAuthParams
+        {
+            AccessToken = _currentProfileDb.AccessToken
+        }, CancellationToken);
     }
 }

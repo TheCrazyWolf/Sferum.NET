@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SferumNet.DbModels.Common;
 using SferumNet.DbModels.Vk;
+using SferumNet.Scenarios;
 using SferumNet.Services.Common;
 
 namespace SferumNet.Services;
@@ -8,7 +9,7 @@ namespace SferumNet.Services;
 public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
 {
     public DateTime? DateTimeStarted { get; private set; }
-    private readonly CancellationToken _cancellationToken = new();
+    private CancellationToken _cancellationToken = new();
 
     public async Task RunAsync()
     {
@@ -28,7 +29,7 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
             
             foreach (var scenario in scenarios)
             {
-                // TODO START
+                // TODO: START
             }
         }
     }
@@ -36,8 +37,8 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
     public Task StopAsync()
     {
         DateTimeStarted = null;
-        
-        // TOOD FINISH
+
+        _cancellationToken = new CancellationToken();
         
         return Task.CompletedTask;
     }

@@ -1,6 +1,8 @@
-
 using SferumNet.DbModels.Enum;
 using SferumNet.Scenarios.Common;
+using SferumNet.Services;
+using VkNet;
+using VkNet.Model;
 
 namespace SferumNet.Scenarios;
 
@@ -8,9 +10,11 @@ public class WelcomeScenario : BaseScenario
 {
     public override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await _logger.LogAsync(_idScenario, EventType.Info, "Сценарий запущен");
+        await base.ExecuteAsync(cancellationToken);
         
-        while (!_cancellationToken.IsCancellationRequested)
+        await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий запущен");
+        
+        while (!CancellationToken.IsCancellationRequested)
         {
             await UpdateProfileAndScAsync();
             
@@ -18,12 +22,12 @@ public class WelcomeScenario : BaseScenario
                 continue;
 
             await RefreshIfTokenExpireAsync();
-            await ResetCounterExecutedIfNextdayAsync();
+            await ResetCounterExecutedIfNextDayAsync();
             await ProcessAsync();
             await Task.Delay(_currentScDb?.Delay ?? 5000, cancellationToken);
         }
         
-        await _logger.LogAsync(_idScenario, EventType.Info, "Сценарий завершен");
+        await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий завершен");
     }
 
     public override bool CanBeExecuted()
@@ -32,19 +36,36 @@ public class WelcomeScenario : BaseScenario
             return false;
         
         // TODO: Проверка на время
+
+        if (_currentScDb.TotalExecuted >= _currentScDb.MaxToExecute)
+            return false;
         
         return _currentScDb.IsActive;
     }
 
     public override async Task ProcessAsync()
     {
+        if (_currentScDb is null || _currentProfileDb is null)
+            return;
+        
         try
         {
-            // TODO
+            
+            VkApi.Messages.Send(new MessagesSendParams
+            {
+                PeerId = _currentScDb.IdConversation,
+                RandomId = new Random().Next()
+            });
+            
+            await ProccessInrecementExecutedAsync();
         }
         catch (Exception e)
         {
-            await _logger.LogAsync(_idScenario, EventType.Error, $"Ошибка при выполнении скрипта\n{e.Message}");
+            await Logger.LogAsync(IdScenario, EventType.Error, $"Ошибка при выполнении скрипта\n{e.Message}");
         }
+    }
+
+    public WelcomeScenario(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
+    {
     }
 }
