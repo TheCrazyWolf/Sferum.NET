@@ -8,8 +8,8 @@ public class Scenario : Entity
     [ForeignKey("IdProfile")]
     public VkProfile? VkProfile { get; set; }
     public long? IdProfile { get; set; }
-    
-    public string Title { get; set; }
+
+    public string Title { get; set; } = "Undefined";
     
     public TimeSpan TimeStart { get; set; }
     public TimeSpan TimeEnd { get; set; }
