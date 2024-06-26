@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SferumNet.DbModels.Common;
 using SferumNet.DbModels.Vk;
-using SferumNet.Scenarios;
+
 using SferumNet.Services.Common;
 
 namespace SferumNet.Services;
@@ -9,10 +9,12 @@ namespace SferumNet.Services;
 public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
 {
     public DateTime? DateTimeStarted { get; private set; }
-    private CancellationToken _cancellationToken = new();
-
+    private CancellationTokenSource _cancelTokenSource = new();
+    
     public async Task RunAsync()
     {
+        _cancelTokenSource = new();
+        
         var profiles = await GetProfilesAsync();
 
         if (profiles is null)
@@ -30,17 +32,17 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
             foreach (var scenario in scenarios)
             {
                 // TODO: START
+                
+                //Task.Run(() => new WelcomeScenario()))
             }
         }
     }
 
-    public Task StopAsync()
+    public async Task StopAsync()
     {
         DateTimeStarted = null;
 
-        _cancellationToken = new CancellationToken();
-        
-        return Task.CompletedTask;
+        await _cancelTokenSource.CancelAsync();
     }
 
     public async Task RestartAsync()
@@ -53,7 +55,7 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
     private async Task<ICollection<VkProfile>?> GetProfilesAsync()
     {
         return await ef.VkProfiles
-            .ToListAsync(cancellationToken: _cancellationToken);
+            .ToListAsync(cancellationToken: _cancelTokenSource.Token);
     }
 
     private async Task<ICollection<Scenario>?> GetScenariosByProfileAsync(long idProfile)
@@ -61,6 +63,6 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
         return await ef.Scenarios
             .Where(sc => sc.IdProfile == idProfile)
             .Where(sc => sc.IsActive)
-            .ToListAsync(cancellationToken: _cancellationToken);
+            .ToListAsync(cancellationToken: _cancelTokenSource.Token);
     }
 }
