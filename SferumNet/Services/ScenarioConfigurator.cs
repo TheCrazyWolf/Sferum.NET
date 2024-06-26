@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SferumNet.DbModels.Common;
 using SferumNet.DbModels.Vk;
 using SferumNet.Services.Common;
@@ -46,13 +47,13 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
 
     private async Task<ICollection<VkProfile>?> GetProfilesAsync()
     {
-        return await _ef.VkProfiles.ToListAsync();
+        return await _ef.VkProfiles.ToListAsync(cancellationToken: _cancellationToken);
     }
 
     private async Task<ICollection<Scenario>?> GetScenariosByProfileAsync(long idProfile)
     {
         return await _ef.Scenarios.Where(sc => sc.IdProfile == idProfile)
             .Where(sc => sc.IsActive)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: _cancellationToken);
     }
 }
