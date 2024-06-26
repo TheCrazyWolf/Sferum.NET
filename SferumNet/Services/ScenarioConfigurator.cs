@@ -7,9 +7,8 @@ namespace SferumNet.Services;
 
 public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
 {
-    private CancellationToken _cancellationToken = new();
-    
-    private readonly SferumNetContext _ef = ef;
+    public DateTime? DateTimeStarted { get; private set; }
+    private readonly CancellationToken _cancellationToken = new();
 
     public async Task RunAsync()
     {
@@ -17,6 +16,8 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
 
         if (profiles is null)
             return;
+        
+        DateTimeStarted = DateTime.Now;
 
         foreach (var profile in profiles)
         {
@@ -25,7 +26,7 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
             if(scenarios is null)
                 continue;
             
-            foreach (var sc in scenarios)
+            foreach (var scenario in scenarios)
             {
                 // TODO START
             }
@@ -34,7 +35,10 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
 
     public Task StopAsync()
     {
+        DateTimeStarted = null;
+        
         // TOOD FINISH
+        
         return Task.CompletedTask;
     }
 
@@ -47,12 +51,14 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
 
     private async Task<ICollection<VkProfile>?> GetProfilesAsync()
     {
-        return await _ef.VkProfiles.ToListAsync(cancellationToken: _cancellationToken);
+        return await ef.VkProfiles
+            .ToListAsync(cancellationToken: _cancellationToken);
     }
 
     private async Task<ICollection<Scenario>?> GetScenariosByProfileAsync(long idProfile)
     {
-        return await _ef.Scenarios.Where(sc => sc.IdProfile == idProfile)
+        return await ef.Scenarios
+            .Where(sc => sc.IdProfile == idProfile)
             .Where(sc => sc.IsActive)
             .ToListAsync(cancellationToken: _cancellationToken);
     }
