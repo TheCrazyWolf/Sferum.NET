@@ -2,6 +2,7 @@ using SferumNet.Components;
 using MudBlazor.Services;
 using SferumNet;
 using SferumNet.Services;
+using SferumNet.Services.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 builder.Services.AddDbContext<SferumNetContext>();
-builder.Services.AddSingleton<DbLogger>();
-
+builder.Services.AddScoped<DbLogger>();
+builder.Services.AddSingleton<IScenarioConfigurator, ScenarioConfigurator>();
 
 var app = builder.Build();
 

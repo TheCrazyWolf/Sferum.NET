@@ -1,13 +1,15 @@
 ﻿@using Microsoft.EntityFrameworkCore
 @using SferumNet.Components.Pages.Components
 @using SferumNet.DbModels.Vk
+@using SferumNet.Services.Common
 <MudNavMenu>
+    <h1>Запущен: @_scSerivce.DateTimeStarted</h1>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudNavLink OnClick="() => OpenAddProfile()" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Новый профиль</MudNavLink>
 
-    @if (_profiles != null)
+    @if (Profiles != null)
     {
-        @foreach (var currentProfile in _profiles)
+        @foreach (var currentProfile in Profiles)
         {
             var url = $"/profile?id={currentProfile.Id}";
             <MudNavLink Href="@url" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">@currentProfile.Name</MudNavLink>
@@ -15,21 +17,22 @@
     }
     else
     {
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
     }
 
 </MudNavMenu>
 
 @inject SferumNetContext Ef;
 @inject IDialogService DialogService
+@inject IScenarioConfigurator _scSerivce;
 
 @code {
 
-    private ICollection<VkProfile>? _profiles { get; set; }
+    private ICollection<VkProfile>? Profiles { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        _profiles = await Ef.VkProfiles.ToListAsync();
+        Profiles = await Ef.VkProfiles.ToListAsync();
     }
 
     private void OpenAddProfile()

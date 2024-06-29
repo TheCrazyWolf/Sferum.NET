@@ -6,16 +6,26 @@ using SferumNet.Services.Common;
 
 namespace SferumNet.Services;
 
-public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
+public class ScenarioConfigurator : IScenarioConfigurator
 {
-    public DateTime? DateTimeStarted { get; private set; }
+    public DateTime? DateTimeStarted { get; set; }
     private CancellationTokenSource _cancelTokenSource = new();
+    private readonly IServiceScopeFactory _scopeFactory;
+
+    public ScenarioConfigurator(IServiceScopeFactory scopeFactory)
+    {
+        _scopeFactory = scopeFactory;
+        _ = RunAsync();
+    }
     
     public async Task RunAsync()
     {
         _cancelTokenSource = new();
         
-        var profiles = await GetProfilesAsync();
+        using var scope = _scopeFactory.CreateScope();
+        var ef = scope.ServiceProvider.GetRequiredService<SferumNetContext>();
+        
+        var profiles = await GetProfilesAsync(ef);
 
         if (profiles is null)
             return;
@@ -24,7 +34,7 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
 
         foreach (var profile in profiles)
         {
-            var scenarios = await GetScenariosByProfileAsync(profile.Id);
+            var scenarios = await GetScenariosByProfileAsync(ef, profile.Id);
 
             if(scenarios is null)
                 continue;
@@ -52,14 +62,13 @@ public class ScenarioConfigurator(SferumNetContext ef) : IScenarioConfigurator
         await RunAsync();
     }
 
-
-    private async Task<ICollection<VkProfile>?> GetProfilesAsync()
+    private async Task<ICollection<VkProfile>?> GetProfilesAsync(SferumNetContext ef)
     {
         return await ef.VkProfiles
             .ToListAsync(cancellationToken: _cancelTokenSource.Token);
     }
 
-    private async Task<ICollection<Scenario>?> GetScenariosByProfileAsync(long idProfile)
+    private async Task<ICollection<Scenario>?> GetScenariosByProfileAsync(SferumNetContext ef, long idProfile)
     {
         return await ef.Scenarios
             .Where(sc => sc.IdProfile == idProfile)
