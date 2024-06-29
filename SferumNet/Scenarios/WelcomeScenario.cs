@@ -1,7 +1,6 @@
 using SferumNet.DbModels.Enum;
 using SferumNet.Scenarios.Common;
 using SferumNet.Services;
-using VkNet;
 using VkNet.Model;
 
 namespace SferumNet.Scenarios;

@@ -11,10 +11,12 @@ public class ScenarioConfigurator : IScenarioConfigurator
     public DateTime? DateTimeStarted { get; set; }
     private CancellationTokenSource _cancelTokenSource = new();
     private readonly IServiceScopeFactory _scopeFactory;
-
-    public ScenarioConfigurator(IServiceScopeFactory scopeFactory)
+    private readonly IScenarioFactory _scenarioFactory;
+    
+    public ScenarioConfigurator(IServiceScopeFactory scopeFactory, IScenarioFactory scenarioFactory)
     {
         _scopeFactory = scopeFactory;
+        _scenarioFactory = scenarioFactory;
         _ = RunAsync();
     }
     
@@ -41,9 +43,8 @@ public class ScenarioConfigurator : IScenarioConfigurator
             
             foreach (var scenario in scenarios)
             {
-                // TODO: START
-                
-                //Task.Run(() => new WelcomeScenario()))
+                var scenarioInstance = _scenarioFactory.CreateScenario(scenario.Type, scenario.Id);
+                await Task.Run(() => scenarioInstance.ExecuteAsync(_cancelTokenSource.Token));
             }
         }
     }
