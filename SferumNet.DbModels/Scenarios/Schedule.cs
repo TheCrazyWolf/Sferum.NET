@@ -5,6 +5,6 @@ namespace SferumNet.DbModels.Scenarios;
 
 public class Schedule : Scenario
 {
-    public SheduleSearchType Type { get; set; }
+    public SheduleSearchType TypeSchedule { get; set; }
     public string Value { get; set; }
 }

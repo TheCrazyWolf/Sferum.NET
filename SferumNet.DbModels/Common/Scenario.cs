@@ -20,7 +20,6 @@ public class Scenario : Entity
     public int TotalExecuted { get; set; }
     public int MaxToExecute { get; set; }
     public int Delay { get; set; }
-    
     public string Type { get; set; }
     public bool IsActive { get; set; }
 }
