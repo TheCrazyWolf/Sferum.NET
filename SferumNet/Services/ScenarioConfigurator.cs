@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using SferumNet.DbModels.Common;
+using SferumNet.DbModels.Scenarios;
 using SferumNet.DbModels.Vk;
-
+using SferumNet.Scenarios;
 using SferumNet.Services.Common;
 
 namespace SferumNet.Services;
@@ -12,39 +13,43 @@ public class ScenarioConfigurator : IScenarioConfigurator
     private CancellationTokenSource _cancelTokenSource = new();
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IScenarioFactory _scenarioFactory;
-    
+
     public ScenarioConfigurator(IServiceScopeFactory scopeFactory, IScenarioFactory scenarioFactory)
     {
         _scopeFactory = scopeFactory;
         _scenarioFactory = scenarioFactory;
         _ = RunAsync();
     }
-    
+
     public async Task RunAsync()
     {
         _cancelTokenSource = new();
-        
+
         using var scope = _scopeFactory.CreateScope();
         var ef = scope.ServiceProvider.GetRequiredService<SferumNetContext>();
-        
+
         var profiles = await GetProfilesAsync(ef);
 
         if (profiles is null)
             return;
-        
+
         DateTimeStarted = DateTime.Now;
 
         foreach (var profile in profiles)
         {
             var scenarios = await GetScenariosByProfileAsync(ef, profile.Id);
 
-            if(scenarios is null)
+            if (scenarios is null)
                 continue;
-            
+
             foreach (var scenario in scenarios)
             {
-                var scenarioInstance = _scenarioFactory.CreateScenario(scenario.Type, scenario.Id);
-                await Task.Run(() => scenarioInstance.ExecuteAsync(_cancelTokenSource.Token));
+                if (scenario is Welcome)
+                    await Task.Run(() =>
+                        new WelcomeScenario(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
+                                scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
+                            .ExecuteAsync(_cancelTokenSource.Token));
+                
             }
         }
     }

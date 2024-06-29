@@ -1,0 +1,84 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using SferumNet.Components.Pages.ModalsSc.Vk
+@using SferumNet.DbModels.Scenarios
+
+@inject SferumNetContext Ef;
+@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="Sc.Title" Label="Название сценария" Variant="Variant.Outlined"></MudTextField>
+        <MudStack Row="true">
+            <MudTimePicker @bind-Time="TimeSpanStart" Variant="Variant.Outlined" Label="Старт" Editable="true"/>
+            <MudTimePicker @bind-Time="TimeSpanEnd"  Variant="Variant.Outlined" Label="Конец" Editable="true"/>
+        </MudStack>
+        <MudStack Row="true">
+            <MudTextField @bind-Value="Sc.IdConversation" ReadOnly="true" Label="ID беседы" Variant="Variant.Outlined"></MudTextField>
+            <MudButton OnClick="OpenChooseConverstion" Color="Color.Primary" Variant="Variant.Outlined">Выбрать</MudButton>
+        </MudStack>
+        <MudTextField @bind-Value="Sc.MaxToExecute" Label="Макс. выполнений за день" Variant="Variant.Outlined"></MudTextField>
+        <MudTextField @bind-Value="Sc.Delay" Label="Задержка между выполнениями" Variant="Variant.Outlined"></MudTextField>
+        <MudSwitch @bind-Value="@Sc.IsActive" Label="Активен" Color="Color.Info" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Закрыть</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public Welcome Sc { get; set; } = new ();
+
+    TimeSpan? TimeSpanStart
+    {
+        get => Sc.TimeStart;
+        set => Sc.TimeStart = value ?? new TimeSpan(07, 00, 00);
+    }
+
+    TimeSpan? TimeSpanEnd
+    {
+        get => Sc.TimeEnd;
+        set => Sc.TimeEnd = value ?? new TimeSpan(21, 00, 00);
+    }
+
+    private async void Submit()
+    {
+        if (Sc.Id is 0)
+            await Add();
+        else
+            await Save();
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(Sc.Id is not 0)
+            Sc = await Ef.ScenarioWelcoms.FirstOrDefaultAsync(x => x.Id == Sc.Id) ?? new Welcome();
+    }
+
+    private async Task Save()
+    {
+        Ef.Update(Sc);
+        await Ef.SaveChangesAsync();
+        MudDialog.Close();
+    }
+
+    private async Task Add()
+    {
+        await Ef.AddAsync(Sc);
+        await Ef.SaveChangesAsync();
+        MudDialog.Close();
+    }
+
+    private async Task OpenChooseConverstion()
+    {
+        var parameters = new DialogParameters<ModalChooseConersation> { { "IdProfile", Sc.IdProfile } };
+        var dialog = await DialogService.ShowAsync<ModalChooseConersation>("Настройка профиля", parameters);
+        var result = await dialog.Result;
+    }
+
+}

@@ -1,0 +1,94 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using SferumNet.DbModels.Vk
+@using SferumNet.Services
+@using VkNet.Model
+@using VkNet
+
+@inject SferumNetContext Ef;
+
+<MudDialog>
+    <DialogContent>
+        @if (_conversationsResult == null)
+        {
+            <MudAlert Severity="Severity.Error">Не удалось загрузить диалоги</MudAlert>
+        }
+        else
+        {
+            <MudRadioGroup @bind-Value="@IdConversion">
+                @foreach (var item in _conversationsResult.Items)
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="mt-2">
+                        <MudRadio T="long" Value="item.Conversation.Peer.Id" Color="Color.Primary">@item.Conversation.ChatSettings?.Title</MudRadio>
+                    </MudAlert>
+                }
+            </MudRadioGroup>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Закрыть</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public long IdProfile { get; set; }
+
+    private GetConversationsResult? _conversationsResult;
+    private VkApi _api = new();
+    private long IdConversion;
+
+    private async void Submit()
+    {
+        /*if (Sc.Id is 0)
+            await Add();
+        else
+            await Save();*/
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var profile = await Ef.VkProfiles.FirstOrDefaultAsync(x => x.Id == IdProfile);
+
+        if (profile is null)
+            return;
+        
+        if (await ValidationToken(profile))
+            GetConversion();
+    }
+
+    private void GetConversion()
+    {
+        try
+        {
+            _conversationsResult = _api.Messages.GetConversations(new GetConversationsParams());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+        }
+    }
+
+    private async Task<bool> ValidationToken(VkProfile vkProfile)
+    {
+        var vkFactory = new VkFactory();
+        var account = (await vkFactory.GetAccountsAsync(vkProfile.RemixSid))?.FirstOrDefault(x => x.UserId == vkProfile.UserId);
+
+        if (account is null)
+            return false;
+
+        vkProfile.AccessToken = account.AccessToken;
+        vkProfile.AccessTokenExpired = account.Expires;
+        
+        await _api.AuthorizeAsync(new ApiAuthParams { AccessToken = vkProfile.AccessToken });
+        _api.VkApiVersion.SetVersion(5,226);
+        Ef.Update(vkProfile);
+        await Ef.SaveChangesAsync();
+
+        return true;
+    }
+
+}
