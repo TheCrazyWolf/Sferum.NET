@@ -1,6 +1,7 @@
 using SferumNet.DbModels.Enum;
 using SferumNet.Scenarios.Common;
 using SferumNet.Services;
+using VkNet.Exception;
 using VkNet.Model;
 using VkNet.Utils;
 
@@ -20,8 +21,7 @@ public class WelcomeScenario : BaseScenario
             
             if(!CanBeExecuted())
                 continue;
-
-            await RefreshIfTokenExpireAsync();
+            
             await ProcessAsync();
             await Task.Delay(_currentScDb?.Delay ?? 5000, cancellationToken);
         }
@@ -46,7 +46,7 @@ public class WelcomeScenario : BaseScenario
     {
         if (_currentScDb is null || _currentProfileDb is null)
             return;
-        
+
         try
         {
 
@@ -62,6 +62,13 @@ public class WelcomeScenario : BaseScenario
         }
         catch (Exception e)
         {
+            
+            if(e is UserAuthorizationFailException)
+            {
+                await RefreshIfTokenExpireAsync();
+                return;
+            }
+            
             await Logger.LogAsync(IdScenario, EventType.Error, $"Ошибка при выполнении скрипта\n{e.Message}");
         }
     }

@@ -4,6 +4,7 @@
 @using SferumNet.Components.Pages.Components
 @using SferumNet.Components.Pages.ModalsSc
 @using SferumNet.DbModels.Common
+@using SferumNet.DbModels.Enum
 @using SferumNet.DbModels.Scenarios
 @using SferumNet.DbModels.Services
 @using SferumNet.DbModels.Vk
@@ -39,7 +40,11 @@
                         <MudButton OnClick="() => OpenModalDeleteSc(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Удалить</MudButton>
                     </MudTabPanel>
                     <MudTabPanel Text="Статистика">
-                        <MudText>Статистика</MudText>
+                        @{
+                            var s = GetStatsLabels();
+                            var charts = GetStatsCharts(scenario.Id);
+                            <MudChart ChartType="ChartType.Line" ChartSeries="charts" XAxisLabels="s" Width="100%" Height="450px" />
+                        }
                     </MudTabPanel>
                     <MudTabPanel Text="Логи">
                         @foreach (var log in GetLogsAsync(scenario.Id).GetAwaiter().GetResult())
@@ -116,9 +121,57 @@ else
         Navigation.NavigateTo($"/profile?id={Id}", true);
     }
 
+    public List<ChartSeries> GetStatsCharts(long idSc)
+    {
+
+        var charts = new List<ChartSeries>();
+
+        var success = new ChartSeries
+        {
+            Name = "Успешно",
+            Data = GetStatsByType(idSc, EventType.Success)
+        };
+
+        var fails = new ChartSeries
+        {
+            Name = "Ошибки",
+            Data = GetStatsByType(idSc, EventType.Error)
+        };
+
+        charts.Add(success);
+        charts.Add(fails);
+
+        return charts;
+    }
+
+    private double[] GetStatsByType(long idSc, EventType logType)
+    {
+        var data = new List<double>();
+        var days = 14;
+
+        for (int i = 0; i < days; i++)
+        {
+            data.Add(Ef.Logs.Count(x => x.IdScenario == idSc && x.DateTime.Date == DateTime.Now.AddDays(-i).Date && x.Type == logType));
+        }
+
+        return data.ToArray();
+    }
+
+    public string[] GetStatsLabels()
+    {
+        var days = 14;
+        var labels = new List<string>();
+        for (int i = 0; i < days; i++)
+        {
+            labels.Add(DateTime.Now.AddDays(-i).ToString("dd.MM"));
+        }
+
+        return labels.ToArray();
+    }
+
     private async Task<IReadOnlyList<Log>> GetLogsAsync(long idSc)
     {
-        var result=  await Ef.Logs.Where(x => x.IdScenario == idSc)
+        var result = await Ef.Logs.Where(x => x.IdScenario == idSc)
             .OrderByDescending(x => x.DateTime)
             .Take(75)
             .ToListAsync();

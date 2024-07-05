@@ -70,6 +70,7 @@ public class BaseScenario : IScenario
             return;
 
         _currentProfileDb = await GetProfileAsync(_currentScDb.IdProfile);
+        await ConfigureVkApiAsync();
     }
 
     protected async Task RefreshIfTokenExpireAsync()
@@ -77,29 +78,25 @@ public class BaseScenario : IScenario
         if (_currentProfileDb is null)
             return;
 
-        if (_currentProfileDb.AccessTokenExpired <= DateTime.Now.Ticks)
+        await Logger.LogAsync(IdScenario, EventType.Info, "Срок действия токена истек. Запрашиваем новый");
+
+        var accounts = await _vkRemixFactory.GetAccountsAsync(_currentProfileDb.RemixSid);
+
+        var webTokenAccount = accounts?.FirstOrDefault(x => x.UserId == _currentProfileDb.UserId);
+
+        if (webTokenAccount is null)
         {
-            await ConfigureVkApiAsync();
-
-            await Logger.LogAsync(IdScenario, EventType.Info, "Срок действия токена истек. Запрашиваем новый");
-
-            var accounts = await _vkRemixFactory.GetAccountsAsync(_currentProfileDb.RemixSid);
-
-            var webTokenAccount = accounts?.FirstOrDefault(x => x.UserId == _currentProfileDb.UserId);
-
-            if (webTokenAccount is null)
-            {
-                await Logger.LogAsync(IdScenario, EventType.Error, "Не удалось обновить токен.");
-                return;
-            }
-
-            _currentProfileDb.AccessTokenExpired = webTokenAccount.Expires;
-            _currentProfileDb.UserId = webTokenAccount.UserId;
-            // _currentProfileDb.AccessToken = webTokenAccount.AccessToken;
-            _currentProfileDb.AccessTokenExpired = DateTime.Now.AddMinutes(10).Ticks;
-            Ef.Update(_currentProfileDb);
-            await Ef.SaveChangesAsync(CancellationToken);
+            await Logger.LogAsync(IdScenario, EventType.Error, "Не удалось обновить токен.");
+            return;
         }
+        
+        _currentProfileDb.UserId = webTokenAccount.UserId;
+        _currentProfileDb.AccessToken = webTokenAccount.AccessToken;
+        _currentProfileDb.AccessTokenExpired = DateTime.Now.AddMinutes(10).Ticks;
+        Ef.Update(_currentProfileDb);
+        await Ef.SaveChangesAsync(CancellationToken);
+            
+        await ConfigureVkApiAsync();
     }
 
     protected async Task ResetCounterExecutedIfNextDayAsync()
