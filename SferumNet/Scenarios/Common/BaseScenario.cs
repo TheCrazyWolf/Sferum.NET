@@ -16,7 +16,7 @@ public class BaseScenario : IScenario
     
     /* Services */
     protected readonly DbLogger Logger;
-    private readonly VkFactory _vkFactory;
+    private readonly VkRemixFactory _vkRemixFactory;
     
     protected readonly SferumNetContext Ef;
     protected readonly VkApi VkApi; 
@@ -31,7 +31,7 @@ public class BaseScenario : IScenario
         IdScenario = idScenario;
 
         VkApi = new VkApi();
-        _vkFactory = new VkFactory();
+        _vkRemixFactory = new VkRemixFactory();
     }
     
     public virtual Task ExecuteAsync(CancellationToken cancellationToken)
@@ -83,7 +83,7 @@ public class BaseScenario : IScenario
             
             await Logger.LogAsync(IdScenario, EventType.Info, "Срок действия токена истек. Запрашиваем новый");
             
-            var accounts = await _vkFactory.GetAccountsAsync(_currentProfileDb.RemixSid);
+            var accounts = await _vkRemixFactory.GetAccountsAsync(_currentProfileDb.RemixSid);
 
             var webTokenAccount = accounts?.FirstOrDefault(x => x.UserId == _currentProfileDb.UserId);
 

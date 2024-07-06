@@ -74,7 +74,7 @@
 
     private async Task<bool> ValidationToken(VkProfile vkProfile)
     {
-        var vkFactory = new VkFactory();
+        var vkFactory = new VkRemixFactory();
         var account = (await vkFactory.GetAccountsAsync(vkProfile.RemixSid))?.FirstOrDefault(x => x.UserId == vkProfile.UserId);
 
         if (account is null)

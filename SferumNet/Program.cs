@@ -14,7 +14,6 @@ builder.Services.AddMudServices();
 builder.Services.AddSingleton<SferumNetContext>();
 builder.Services.AddScoped<DbLogger>();
 builder.Services.AddSingleton<IScenarioConfigurator, ScenarioConfigurator>();
-builder.Services.AddSingleton<IScenarioFactory, ScenarioFactory>();
 
 var app = builder.Build();
 
