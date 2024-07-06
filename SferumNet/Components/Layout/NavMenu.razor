@@ -3,10 +3,9 @@
 @using SferumNet.DbModels.Vk
 @using SferumNet.Services.Common
 <MudNavMenu>
-    <h1>Запущен: @_scSerivce.DateTimeStarted</h1>
+    <MudNavLink Href="/home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ElectricalServices">Служба запущена: @_scSerivce.DateTimeStarted</MudNavLink>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudNavLink OnClick="() => OpenAddProfile()" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Новый профиль</MudNavLink>
-
     @if (Profiles != null)
     {
         @foreach (var currentProfile in Profiles)
@@ -19,7 +18,6 @@
     {
         <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
     }
-
 </MudNavMenu>
 
 @inject SferumNetContext Ef;

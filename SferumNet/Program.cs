@@ -11,7 +11,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
-builder.Services.AddDbContext<SferumNetContext>();
+builder.Services.AddSingleton<SferumNetContext>();
 builder.Services.AddScoped<DbLogger>();
 builder.Services.AddSingleton<IScenarioConfigurator, ScenarioConfigurator>();
 builder.Services.AddSingleton<IScenarioFactory, ScenarioFactory>();
