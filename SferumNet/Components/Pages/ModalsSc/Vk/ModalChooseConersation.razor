@@ -39,12 +39,9 @@
     private VkApi _api = new();
     private long IdConversion;
 
-    private async void Submit()
+    private void Submit()
     {
-        /*if (Sc.Id is 0)
-            await Add();
-        else
-            await Save();*/
+        MudDialog.Close(IdConversion);
     }
 
     private void Cancel() => MudDialog.Cancel();
@@ -75,7 +72,8 @@
     private async Task<bool> ValidationToken(VkProfile vkProfile)
     {
         var vkFactory = new VkRemixFactory();
-        var account = (await vkFactory.GetAccountsAsync(vkProfile.RemixSid))?.FirstOrDefault(x => x.UserId == vkProfile.UserId);
+        var account = (await vkFactory.GetAccountsAsync(vkProfile.RemixSid))?
+            .FirstOrDefault(x => x.UserId == vkProfile.UserId);
 
         if (account is null)
             return false;
