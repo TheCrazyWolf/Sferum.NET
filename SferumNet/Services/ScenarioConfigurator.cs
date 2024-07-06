@@ -12,12 +12,10 @@ public class ScenarioConfigurator : IScenarioConfigurator
     public DateTime? DateTimeStarted { get; set; }
     private CancellationTokenSource _cancelTokenSource = new();
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IScenarioFactory _scenarioFactory;
 
-    public ScenarioConfigurator(IServiceScopeFactory scopeFactory, IScenarioFactory scenarioFactory)
+    public ScenarioConfigurator(IServiceScopeFactory scopeFactory)
     {
         _scopeFactory = scopeFactory;
-        _scenarioFactory = scenarioFactory;
         _ = RunAsync();
     }
 
