@@ -17,6 +17,9 @@
             <MudRadioGroup @bind-Value="@IdConversion">
                 @foreach (var item in _conversationsResult.Items)
                 {
+                    if(item.Conversation.ChatSettings is null)
+                        continue;
+                    
                     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="mt-2">
                         <MudRadio T="long" Value="item.Conversation.Peer.Id" Color="Color.Primary">@item.Conversation.ChatSettings?.Title</MudRadio>
                     </MudAlert>

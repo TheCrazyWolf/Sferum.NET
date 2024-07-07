@@ -1,13 +1,17 @@
 ﻿@page "/profile"
 @using Microsoft.EntityFrameworkCore
+@using SferumNet.Components.Modal
 @using SferumNet.Components.Pages.Components
 @using SferumNet.Components.Pages.ModalsSc
 @using SferumNet.DbModels.Common
 @using SferumNet.DbModels.Scenarios
+@using SferumNet.DbModels.Services
 @using SferumNet.DbModels.Vk
+@using SferumNet.Scenarios
 
 @inject IDialogService DialogService
 @inject SferumNetContext Ef;
+@inject NavigationManager Navigation;
 
 <PageTitle>Сценарии пользователя: @_currentProfile.Name</PageTitle>
 
@@ -31,14 +35,18 @@
                 <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
                     <MudTabPanel Text="Действия">
                         <MudText>Работает с @scenario.TimeStart до @scenario.TimeEnd</MudText>
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary">Редактировать</MudButton>
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary">Удалить</MudButton>
+                        <MudButton OnClick="() => OpenEditSc(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Редактировать</MudButton>
+                        <MudButton OnClick="() => OpenModalDeleteSc(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Удалить</MudButton>
                     </MudTabPanel>
                     <MudTabPanel Text="Статистика">
                         <MudText>Статистика</MudText>
                     </MudTabPanel>
                     <MudTabPanel Text="Логи">
-
+                        @foreach (var log in GetLogsAsync(scenario.Id).GetAwaiter().GetResult())
+                        {
+                            string buildStrLabel = $"{log.DateTime} {log.Type}";
+                            <MudTextField T="string" ReadOnly="true" Label="@buildStrLabel" Variant="Variant.Filled" Text="@log.Message" Lines="1" Adornment="Adornment.End"/>
+                        }
                     </MudTabPanel>
                 </MudTabs>
             </MudExpansionPanel>
@@ -75,13 +83,67 @@ else
     private async void OpenEditProfile()
     {
         var parameters = new DialogParameters<ModalAddProfile> { { "Profile", new VkProfile { Id = Id } } };
-        await DialogService.ShowAsync<ModalAddProfile>("Настройка профиля", parameters);
+        var dialog = await DialogService.ShowAsync<ModalAddProfile>("Настройка профиля", parameters);
+        await dialog.Result;
+        RefreshPage();
     }
 
     private async void OpenCreateSc()
     {
         var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome { IdProfile = Id } } };
-        await DialogService.ShowAsync<ModalScWelcome>("Новый сценарий", parameters);
+        var dialog = await DialogService.ShowAsync<ModalScWelcome>("Новый сценарий", parameters);
+        await dialog.Result;
+        RefreshPage();
+    }
+
+
+    private async void OpenEditSc(Scenario scenario)
+    {
+        if (scenario is Welcome)
+        {
+            var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome { Id = scenario.Id } } };
+            var dialog = await DialogService.ShowAsync<ModalScWelcome>("Редактировать", parameters);
+            await dialog.Result;
+        }
+
+        // ETC
+
+        RefreshPage();
+    }
+
+    private void RefreshPage()
+    {
+        Navigation.NavigateTo($"/profile?id={Id}", true);
+    }
+
+    private async Task<IReadOnlyList<Log>> GetLogsAsync(long IdSc)
+    {
+        return await Ef.Logs.Where(x => x.IdScenario == Id).OrderByDescending(x => x.DateTime).Take(75).ToListAsync();
+    }
+
+    private async Task OpenModalDeleteSc(Scenario scenario)
+    {
+        var dialog = await DialogService.ShowAsync<ModalConfirmDialog>();
+        var valueResult = await dialog.Result;
+
+        if (valueResult.Data is null)
+            return;
+
+        if ((bool)valueResult.Data)
+            await ProccessToDeleteAsync(scenario.Id);
+
+        RefreshPage();
+    }
+
+    private async Task ProccessToDeleteAsync(long idSc)
+    {
+        var scDb = await Ef.Scenarios.FirstOrDefaultAsync(x => x.Id == idSc);
+
+        if (scDb is null)
+            return;
+
+        Ef.Remove(scDb);
+        await Ef.SaveChangesAsync();
     }
 
 }

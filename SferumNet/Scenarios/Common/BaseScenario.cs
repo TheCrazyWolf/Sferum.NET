@@ -34,10 +34,10 @@ public class BaseScenario : IScenario
         _vkRemixFactory = new VkRemixFactory();
     }
     
-    public virtual Task ExecuteAsync(CancellationToken cancellationToken)
+    public virtual async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         CancellationToken = cancellationToken;
-        return Task.CompletedTask;
+        await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий запущен");
     }
 
     public virtual bool CanBeExecuted()

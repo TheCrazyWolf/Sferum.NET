@@ -11,8 +11,6 @@ public class WelcomeScenario : BaseScenario
     {
         await base.ExecuteAsync(cancellationToken);
         
-        await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий запущен");
-        
         while (!CancellationToken.IsCancellationRequested)
         {
             await UpdateProfileAndScAsync();
