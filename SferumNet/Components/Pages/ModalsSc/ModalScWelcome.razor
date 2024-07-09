@@ -10,15 +10,18 @@
         <MudTextField @bind-Value="Sc.Title" Label="Название сценария" Variant="Variant.Outlined"></MudTextField>
         <MudStack Row="true">
             <MudTimePicker @bind-Time="TimeSpanStart" Variant="Variant.Outlined" Label="Старт" Editable="true"/>
-            <MudTimePicker @bind-Time="TimeSpanEnd"  Variant="Variant.Outlined" Label="Конец" Editable="true"/>
+            <MudTimePicker @bind-Time="TimeSpanEnd" Variant="Variant.Outlined" Label="Конец" Editable="true"/>
         </MudStack>
         <MudStack Row="true">
             <MudTextField @bind-Value="Sc.IdConversation" ReadOnly="true" Label="ID беседы" Variant="Variant.Outlined"></MudTextField>
             <MudButton OnClick="OpenChooseConverstion" Color="Color.Primary" Variant="Variant.Outlined">Выбрать</MudButton>
         </MudStack>
-        <MudTextField @bind-Value="Sc.MaxToExecute" Label="Макс. выполнений за день" Variant="Variant.Outlined"></MudTextField>
-        <MudTextField @bind-Value="Sc.Delay" Label="Задержка между выполнениями" Variant="Variant.Outlined"></MudTextField>
-        <MudSwitch @bind-Value="@Sc.IsActive" Label="Активен" Color="Color.Info" />
+        <MudAlert Class="mt-4" Variant="Variant.Outlined" Severity="Severity.Warning">Соблюдайте разумный интервал как для частоты запросов в день и между ними. Частые запросы могут привести к блокировке аккаунтаы</MudAlert>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="my-2">
+            <MudSlider @bind-Value="Sc.MaxToExecute" Min="1" Max="10000" Step="1" Color="Color.Primary">Макс. выполнений за день: @Sc.MaxToExecute</MudSlider>
+            <MudSlider @bind-Value="Sc.Delay" Min="3000" Max="7200000" Step="1000" Color="Color.Primary">Задержка между выполнениями (милисикунды): @Sc.Delay</MudSlider>
+        </MudAlert>
+        <MudSwitch @bind-Value="@Sc.IsActive" Label="Активен" Color="Color.Info"/>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Закрыть</MudButton>
@@ -30,7 +33,7 @@
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    [Parameter] public Welcome Sc { get; set; } = new ();
+    [Parameter] public Welcome Sc { get; set; } = new();
 
     TimeSpan? TimeSpanStart
     {
@@ -56,7 +59,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if(Sc.Id is not 0)
+        if (Sc.Id is not 0)
             Sc = await Ef.ScenarioWelcoms.FirstOrDefaultAsync(x => x.Id == Sc.Id) ?? new Welcome();
     }
 
@@ -79,7 +82,7 @@
         var parameters = new DialogParameters<ModalChooseConversation> { { "IdProfile", Sc.IdProfile } };
         var dialog = await DialogService.ShowAsync<ModalChooseConversation>("Настройка профиля", parameters);
         var result = await dialog.Result;
-        Sc.IdConversation = (long) result.Data;
+        Sc.IdConversation = (long)result.Data;
     }
 
 }

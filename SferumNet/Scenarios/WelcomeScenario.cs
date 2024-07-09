@@ -34,7 +34,8 @@ public class WelcomeScenario : BaseScenario
         if (_currentScDb is null || _currentProfileDb is null)
             return false;
         
-        // TODO: Проверка на время
+        if (!(DateTime.Now.TimeOfDay >= _currentScDb.TimeStart && DateTime.Now.TimeOfDay <= _currentScDb.TimeEnd))
+            return false;
 
         if (_currentScDb.TotalExecuted >= _currentScDb.MaxToExecute)
             return false;

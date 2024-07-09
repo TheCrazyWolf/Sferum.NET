@@ -8,7 +8,6 @@
 @using SferumNet.DbModels.Scenarios
 @using SferumNet.DbModels.Services
 @using SferumNet.DbModels.Vk
-@using SferumNet.Scenarios
 
 @inject IDialogService DialogService
 @inject SferumNetContext Ef;
@@ -21,8 +20,8 @@
 
 <MudPaper Elevation="5">
     <MudToolBar>
-        <MudIconButton OnClick="OpenCreateSc" Icon="@Icons.Material.Outlined.Add"/>
-        <MudIconButton OnClick="() => OpenEditProfile()" Icon="@Icons.Material.Outlined.Edit"/>
+        <MudIconButton OnClick="OpenModalCreateSc" Icon="@Icons.Material.Outlined.Add"/>
+        <MudIconButton OnClick="() => OpenModalEditProfile()" Icon="@Icons.Material.Outlined.Edit"/>
         <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit"/>
     </MudToolBar>
 </MudPaper>
@@ -35,15 +34,16 @@
             <MudExpansionPanel Text="@scenario.Title">
                 <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
                     <MudTabPanel Text="Действия">
-                        <MudText>Работает с @scenario.TimeStart до @scenario.TimeEnd</MudText>
-                        <MudButton OnClick="() => OpenEditSc(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Редактировать</MudButton>
+                        <MudText>По расписанию с @scenario.TimeStart до @scenario.TimeEnd</MudText>
+                        <MudText>Активен: @(scenario.IsActive ? "Да" : "Нет")</MudText>
+                        <MudButton OnClick="() => OpenModalEditSc(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Редактировать</MudButton>
                         <MudButton OnClick="() => OpenModalDeleteSc(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Удалить</MudButton>
                     </MudTabPanel>
                     <MudTabPanel Text="Статистика">
                         @{
                             var s = GetStatsLabels();
                             var charts = GetStatsCharts(scenario.Id);
-                            <MudChart ChartType="ChartType.Line" ChartSeries="charts" XAxisLabels="s" Width="100%" Height="450px" />
+                            <MudChart ChartType="ChartType.Line" ChartSeries="charts" XAxisLabels="s" Width="100%" Height="450px"/>
                         }
                     </MudTabPanel>
                     <MudTabPanel Text="Логи">
@@ -85,7 +85,7 @@ else
         _scenarios = await Ef.Scenarios.Where(x => x.IdProfile == Id).ToListAsync();
     }
 
-    private async void OpenEditProfile()
+    private async void OpenModalEditProfile()
     {
         var parameters = new DialogParameters<ModalAddProfile> { { "Profile", new VkProfile { Id = Id } } };
         var dialog = await DialogService.ShowAsync<ModalAddProfile>("Настройка профиля", parameters);
@@ -93,7 +93,7 @@ else
         RefreshPage();
     }
 
-    private async void OpenCreateSc()
+    private async void OpenModalCreateSc()
     {
         var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome { IdProfile = Id } } };
         var dialog = await DialogService.ShowAsync<ModalScWelcome>("Новый сценарий", parameters);
@@ -102,7 +102,7 @@ else
     }
 
 
-    private async void OpenEditSc(Scenario scenario)
+    private async void OpenModalEditSc(Scenario scenario)
     {
         if (scenario is Welcome)
         {
@@ -121,34 +121,29 @@ else
         Navigation.NavigateTo($"/profile?id={Id}", true);
     }
 
-    public List<ChartSeries> GetStatsCharts(long idSc)
+    private List<ChartSeries> GetStatsCharts(long idSc)
     {
-
-        var charts = new List<ChartSeries>();
-
-        var success = new ChartSeries
+        return new List<ChartSeries>
         {
-            Name = "Успешно",
-            Data = GetStatsByType(idSc, EventType.Success)
+            new()
+            {
+                Name = "Успешно",
+                Data = GetCountLogByType(idSc, EventType.Success)
+            },
+
+            new()
+            {
+                Name = "Ошибки",
+                Data = GetCountLogByType(idSc, EventType.Error)
+            }
         };
-
-        var fails = new ChartSeries
-        {
-            Name = "Ошибки",
-            Data = GetStatsByType(idSc, EventType.Error)
-        };
-
-        charts.Add(success);
-        charts.Add(fails);
-
-        return charts;
+        ;
     }
 
-    private double[] GetStatsByType(long idSc, EventType logType)
+    private double[] GetCountLogByType(long idSc, EventType logType)
     {
         var data = new List<double>();
         var days = 14;
-
         for (int i = 0; i < days; i++)
         {
             data.Add(Ef.Logs.Count(x => x.IdScenario == idSc && x.DateTime.Date == DateTime.Now.AddDays(-i).Date && x.Type == logType));
@@ -157,7 +152,7 @@ else
         return data.ToArray();
     }
 
-    public string[] GetStatsLabels()
+    private string[] GetStatsLabels()
     {
         var days = 14;
         var labels = new List<string>();
@@ -173,7 +168,7 @@ else
     {
         var result = await Ef.Logs.Where(x => x.IdScenario == idSc)
             .OrderByDescending(x => x.DateTime)
-            .Take(75)
+            .Take(10)
             .ToListAsync();
 
         return result;
@@ -188,12 +183,12 @@ else
             return;
 
         if ((bool)valueResult.Data)
-            await ProccessToDeleteAsync(scenario.Id);
+            await ProccessToDeleteScAsync(scenario.Id);
 
         RefreshPage();
     }
 
-    private async Task ProccessToDeleteAsync(long idSc)
+    private async Task ProccessToDeleteScAsync(long idSc)
     {
         var scDb = await Ef.Scenarios
             .FirstOrDefaultAsync(x => x.Id == idSc);

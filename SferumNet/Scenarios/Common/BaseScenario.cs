@@ -64,8 +64,8 @@ public class BaseScenario : IScenario
 
     protected async Task UpdateProfileAndScAsync()
     {
-        _currentScDb = await GetScenarioAsync(IdScenario);
-
+       var currentScDb = await GetScenarioAsync(IdScenario);
+       _currentScDb = currentScDb;
         if (_currentScDb is null)
             return;
 
