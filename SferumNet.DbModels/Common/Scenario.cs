@@ -9,10 +9,10 @@ public class Scenario : Entity
     public VkProfile? VkProfile { get; set; }
     public long? IdProfile { get; set; }
 
-    public string Title { get; set; } = "Undefined";
-    
-    public TimeSpan TimeStart { get; set; }
-    public TimeSpan TimeEnd { get; set; }
+    public string Title { get; set; } = "Новый сценарий";
+
+    public TimeSpan TimeStart { get; set; } = new (09, 00, 00);
+    public TimeSpan TimeEnd { get; set; } = new (19, 00, 00);
     public long IdConversation { get; set; }
     
     public DateTime LastExecuted { get; set; }
