@@ -3,7 +3,7 @@ using SferumNet.DbModels.Vk;
 
 namespace SferumNet.DbModels.Common;
 
-public class Scenario : Entity
+public class Job : Entity
 {
     [ForeignKey("IdProfile")]
     public VkProfile? VkProfile { get; set; }

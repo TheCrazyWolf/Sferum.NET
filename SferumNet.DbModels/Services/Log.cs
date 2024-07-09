@@ -10,6 +10,6 @@ public class Log : Entity
     public DateTime DateTime { get; set; }
     public string Message { get; set; } = string.Empty;
 
-    [ForeignKey("IdScenario")] public Scenario? Scenario { get; set; }
+    [ForeignKey("IdScenario")] public Job? Scenario { get; set; }
     public long? IdScenario { get; set; }
 }

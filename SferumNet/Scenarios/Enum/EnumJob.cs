@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SferumNet.Scenarios;
 
-public enum EnumScenario
+public enum EnumJob
 {
     [Display(Name = "Приветствие")]
     Welcome,
-    [Display(Name = "Флуды")]
-    Flood
+    [Display(Name = "Интересные факты")]
+    Facts
 }

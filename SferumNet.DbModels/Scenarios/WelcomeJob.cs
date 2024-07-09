@@ -2,7 +2,7 @@
 
 namespace SferumNet.DbModels.Scenarios;
 
-public class Welcome : Scenario
+public class WelcomeJob : Job
 {
 
 }

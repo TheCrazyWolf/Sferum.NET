@@ -2,7 +2,7 @@
 
 namespace SferumNet.DbModels.Scenarios;
 
-public class Flood : Scenario
+public class FactJob : Job
 {
 
 }

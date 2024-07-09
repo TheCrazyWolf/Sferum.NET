@@ -35,7 +35,7 @@
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    [Parameter] public Welcome Sc { get; set; } = new();
+    [Parameter] public WelcomeJob Sc { get; set; } = new();
 
     TimeSpan? TimeSpanStart
     {
@@ -62,7 +62,7 @@
     protected override async Task OnInitializedAsync()
     {
         if (Sc.Id is not 0)
-            Sc = await Ef.ScenarioWelcoms.FirstOrDefaultAsync(x => x.Id == Sc.Id) ?? new Welcome();
+            Sc = await Ef.WelcomJobs.FirstOrDefaultAsync(x => x.Id == Sc.Id) ?? new WelcomeJob();
     }
 
     private async Task Save()

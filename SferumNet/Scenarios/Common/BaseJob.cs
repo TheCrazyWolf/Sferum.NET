@@ -10,7 +10,7 @@ using VkNet.Model;
 
 namespace SferumNet.Scenarios.Common;
 
-public class BaseScenario : IScenario
+public class BaseJob : IJob
 {
     protected readonly long IdScenario;
     protected CancellationToken CancellationToken;
@@ -23,9 +23,9 @@ public class BaseScenario : IScenario
     protected readonly VkApi VkApi;
 
     protected VkProfile? CurrentProfileDb;
-    protected Scenario? CurrentScDb;
+    protected Job? CurrentScDb;
 
-    public BaseScenario(SferumNetContext ef, DbLogger dbLogger, long idScenario)
+    public BaseJob(SferumNetContext ef, DbLogger dbLogger, long idScenario)
     {
         Ef = ef;
         Logger = dbLogger;
@@ -57,7 +57,7 @@ public class BaseScenario : IScenario
             .FirstOrDefaultAsync(x => x.Id == idProfile, cancellationToken: CancellationToken);
     }
 
-    private async Task<Scenario?> GetScenarioAsync(long idSc)
+    private async Task<Job?> GetScenarioAsync(long idSc)
     {
         return await Ef.Scenarios
             .FirstOrDefaultAsync(x => x.Id == idSc, cancellationToken: CancellationToken);

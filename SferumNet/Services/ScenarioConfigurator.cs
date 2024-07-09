@@ -5,6 +5,7 @@ using SferumNet.DbModels.Scenarios;
 using SferumNet.DbModels.Vk;
 using SferumNet.Scenarios;
 using SferumNet.Services.Common;
+using WelcomeJob = SferumNet.Scenarios.WelcomeJob;
 
 namespace SferumNet.Services;
 
@@ -36,16 +37,16 @@ public class ScenarioConfigurator : IScenarioConfigurator
 
         foreach (var profile in profiles)
         {
-            var scenarios = await GetScenariosByProfileAsync(ef, profile.Id);
+            var scenarios = await GetJobsByProfileAsync(ef, profile.Id);
 
             if (scenarios is null)
                 continue;
 
             foreach (var scenario in scenarios)
             {
-                if (scenario is Welcome)
+                if (scenario is DbModels.Scenarios.WelcomeJob)
                     await Task.Run(() =>
-                        new WelcomeScenario(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
+                        new WelcomeJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
                                 scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
                             .ExecuteAsync(_cancelTokenSource.Token));
                 
@@ -74,7 +75,7 @@ public class ScenarioConfigurator : IScenarioConfigurator
             .ToListAsync(cancellationToken: _cancelTokenSource.Token);
     }
 
-    private async Task<ICollection<Scenario>?> GetScenariosByProfileAsync(SferumNetContext ef, long idProfile)
+    private async Task<ICollection<Job>?> GetJobsByProfileAsync(SferumNetContext ef, long idProfile)
     {
         return await ef.Scenarios
             .Where(sc => sc.IdProfile == idProfile)

@@ -1,6 +1,7 @@
 @using SferumNet.DbModels.Scenarios
 @using SferumNet.Scenarios
 @using SferumNet.Scenarios.Extensions
+@using WelcomeJob = SferumNet.DbModels.Scenarios.WelcomeJob
 
 @inject IDialogService DialogService
 
@@ -9,9 +10,9 @@
         <MudSelect Label="Шаблон"
                    @bind-Value="@_selectedJob"
                    AnchorOrigin="Origin.BottomCenter">
-            @foreach (var item in Enum.GetValues(typeof(EnumScenario)).Cast<EnumScenario>())
+            @foreach (var item in Enum.GetValues(typeof(EnumJob)).Cast<EnumJob>())
             {
-                <MudSelectItem T="EnumScenario" Value="item">@item.GetDisplayName()</MudSelectItem>
+                <MudSelectItem T="EnumJob" Value="item">@item.GetDisplayName()</MudSelectItem>
             }
         </MudSelect>
     </DialogContent>
@@ -27,16 +28,16 @@
 
     [Parameter] public long IdProfile { get; set; }
 
-    private EnumScenario _selectedJob = EnumScenario.Welcome;
+    private EnumJob _selectedJob = EnumJob.Welcome;
 
     private void Cancel() => MudDialog.Cancel();
 
     private async void Select()
     {
-        if (_selectedJob is EnumScenario.Welcome)
+        if (_selectedJob is EnumJob.Welcome)
         {
-            var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome() { IdProfile = IdProfile } } };
-            var dialog = await DialogService.ShowAsync<ModalScWelcome>("Новый сценарий", parameters);
+            var parameters = new DialogParameters<ModalWelcomJob> { { "Sc", new WelcomeJob() { IdProfile = IdProfile } } };
+            var dialog = await DialogService.ShowAsync<ModalWelcomJob>("Новый сценарий", parameters);
             await dialog.Result;
         }
     }

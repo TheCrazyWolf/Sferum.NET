@@ -1,4 +1,5 @@
 ﻿@page "/profile"
+
 @using Microsoft.EntityFrameworkCore
 @using SferumNet.Components.Pages.Components.App
 @using SferumNet.Components.Pages.Components.Job
@@ -41,12 +42,12 @@
                     <MudTabPanel Text="Действия">
                         <MudText>По расписанию с @scenario.TimeStart до @scenario.TimeEnd</MudText>
                         <MudText>Активен: @(scenario.IsActive ? "Да" : "Нет")</MudText>
-                        <MudButton OnClick="() => OpenModalEditSc(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Редактировать</MudButton>
-                        <MudButton OnClick="() => OpenModalDeleteSc(scenario)" Variant="Variant.Outlined" Color="Color.Error">Удалить</MudButton>
+                        <MudButton OnClick="() => OpenModalEditJob(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Редактировать</MudButton>
+                        <MudButton OnClick="() => OpenModalDeleteJob(scenario)" Variant="Variant.Outlined" Color="Color.Error">Удалить</MudButton>
                     </MudTabPanel>
                     <MudTabPanel Text="Статистика">
                         <MudText>Статистика за последние @ChartConst.DefaultDaysByChar дней</MudText>
-                        <MudChart ChartType="ChartType.Line" ChartSeries="@GetStatsCharts(scenario.Id)" XAxisLabels="@GetStatsLabels()" Width="100%" Height="450px"/>
+                        <MudChart ChartType="ChartType.Line" ChartSeries="@GetStatsChartsFromJobLogs(scenario.Id)" XAxisLabels="@GetStatsLabels()" Width="100%" Height="450px"/>
                     </MudTabPanel>
                     <MudTabPanel Text="Логи">
                         <MudText>Показаны последние события</MudText>
@@ -70,12 +71,12 @@ else
 
     [Parameter] [SupplyParameterFromQuery] public long Id { get; set; }
     private VkProfile _currentProfile = new();
-    private ICollection<Scenario>? _scenarios;
+    private ICollection<Job>? _scenarios;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadDbProfile();
-        await LoadScenarios();
+        await LoadJobs();
     }
 
     private async Task LoadDbProfile()
@@ -83,7 +84,7 @@ else
         _currentProfile = await Ef.VkProfiles.FirstOrDefaultAsync(x => x.Id == Id) ?? new VkProfile();
     }
 
-    private async Task LoadScenarios()
+    private async Task LoadJobs()
     {
         _scenarios = await Ef.Scenarios.Where(x => x.IdProfile == Id).ToListAsync();
     }
@@ -119,12 +120,12 @@ else
     }
 
 
-    private async void OpenModalEditSc(Scenario scenario)
+    private async void OpenModalEditJob(Job job)
     {
-        if (scenario is Welcome)
+        if (job is WelcomeJob)
         {
-            var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome { Id = scenario.Id } } };
-            var dialog = await DialogService.ShowAsync<ModalScWelcome>("Редактировать", parameters);
+            var parameters = new DialogParameters<ModalWelcomJob> { { "Sc", new WelcomeJob { Id = job.Id } } };
+            var dialog = await DialogService.ShowAsync<ModalWelcomJob>("Редактировать", parameters);
             await dialog.Result;
         }
 
@@ -139,31 +140,30 @@ else
         Navigation.NavigateTo($"/profile?id={Id}", true);
     }
 
-    private List<ChartSeries> GetStatsCharts(long idSc)
+    private List<ChartSeries> GetStatsChartsFromJobLogs(long idJob)
     {
         return new List<ChartSeries>
         {
             new()
             {
                 Name = "Успешно",
-                Data = GetCountLogByType(idSc, EventType.Success)
+                Data = GetCountLogByTypeFromJob(idJob, EventType.Success)
             },
 
             new()
             {
                 Name = "Ошибки",
-                Data = GetCountLogByType(idSc, EventType.Error)
+                Data = GetCountLogByTypeFromJob(idJob, EventType.Error)
             }
         };
-        ;
     }
 
-    private double[] GetCountLogByType(long idSc, EventType logType)
+    private double[] GetCountLogByTypeFromJob(long idJob, EventType logType)
     {
         var data = new List<double>();
         for (int i = 0; i < ChartConst.DefaultDaysByChar; i++)
         {
-            data.Add(Ef.Logs.Count(x => x.IdScenario == idSc && x.DateTime.Date == DateTime.Now.AddDays(-i).Date && x.Type == logType));
+            data.Add(Ef.Logs.Count(x => x.IdScenario == idJob && x.DateTime.Date == DateTime.Now.AddDays(-i).Date && x.Type == logType));
         }
 
         return data.ToArray();
@@ -180,9 +180,9 @@ else
         return labels.ToArray();
     }
 
-    private async Task<IReadOnlyList<Log>> GetLogsAsync(long idSc)
+    private async Task<IReadOnlyList<Log>> GetLogsAsync(long idJob)
     {
-        var result = await Ef.Logs.Where(x => x.IdScenario == idSc)
+        var result = await Ef.Logs.Where(x => x.IdScenario == idJob)
             .OrderByDescending(x => x.DateTime)
             .Take(10)
             .ToListAsync();
@@ -190,7 +190,7 @@ else
         return result;
     }
 
-    private async Task OpenModalDeleteSc(Scenario scenario)
+    private async Task OpenModalDeleteJob(Job job)
     {
         var dialog = await DialogService.ShowAsync<ModalConfirmDialog>();
         var valueResult = await dialog.Result;
@@ -199,12 +199,12 @@ else
             return;
 
         if ((bool)valueResult.Data)
-            await ProccessToDeleteScAsync(scenario.Id);
+            await ProccessToDeleteJobAsync(job.Id);
 
         RefreshPage();
     }
 
-    private async Task ProccessToDeleteScAsync(long idSc)
+    private async Task ProccessToDeleteJobAsync(long idSc)
     {
         var scDb = await Ef.Scenarios
             .FirstOrDefaultAsync(x => x.Id == idSc);
