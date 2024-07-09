@@ -1,4 +1,5 @@
 ﻿@using Microsoft.EntityFrameworkCore
+@using SferumNet.Configs
 @using SferumNet.DbModels.Vk
 @using SferumNet.Services
 @using VkNet.Model
@@ -6,29 +7,35 @@
 
 @inject SferumNetContext Ef;
 
-<MudDialog>
+<MudDialog DisableSidePadding="true">
     <DialogContent>
-        @if (_conversationsResult == null)
-        {
-            <MudAlert Severity="Severity.Error">Не удалось загрузить диалоги</MudAlert>
-        }
-        else
-        {
-            <MudRadioGroup @bind-Value="@_idConversion">
-                @foreach (var item in _conversationsResult.Items)
-                {
-                    /* Почему то некотоыре диалоги null и все падает типо крч пропустим
-                     вроде типа личные сообщения
-                     */
-                    if(item.Conversation.ChatSettings is null)
-                        continue;
-                    
-                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="mt-2">
-                        <MudRadio T="long" Value="item.Conversation.Peer.Id" Color="Color.Primary">@item.Conversation.ChatSettings?.Title</MudRadio>
-                    </MudAlert>
-                }
-            </MudRadioGroup>
-        }
+        <MudContainer Style="max-height: 300px; overflow-y: scroll">
+            @if (_conversationsResult == null)
+            {
+                <MudAlert Severity="Severity.Error">Не удалось загрузить диалоги</MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" NoIcon="true">
+                    Показаны последние 50 бесед
+                </MudAlert>
+                
+                <MudRadioGroup @bind-Value="@_idConversion">
+                    @foreach (var item in _conversationsResult.Items)
+                    {
+                        /* Почему то некотоыре диалоги null и все падает типо крч пропустим
+                         вроде типа личные сообщения
+                         */
+                        if (item.Conversation.ChatSettings is null)
+                            continue;
+
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="mt-2">
+                            <MudRadio T="long" Value="item.Conversation.Peer.Id" Color="Color.Primary">@item.Conversation.ChatSettings.Title</MudRadio>
+                        </MudAlert>
+                    }
+                </MudRadioGroup>
+            }
+        </MudContainer>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Закрыть</MudButton>
@@ -58,7 +65,7 @@
 
         if (profile is null)
             return;
-        
+
         if (await ValidationToken(profile))
             GetConversion();
     }
@@ -67,7 +74,7 @@
     {
         try
         {
-            _conversationsResult = _api.Messages.GetConversations(new GetConversationsParams());
+            _conversationsResult = _api.Messages.GetConversations(new GetConversationsParams() { Count = 50 });
         }
         catch (Exception e)
         {
@@ -87,7 +94,7 @@
         vkProfile.AccessToken = account.AccessToken;
         vkProfile.AccessTokenExpired = DateTime.Now.AddMinutes(10).Ticks;
         await _api.AuthorizeAsync(new ApiAuthParams { AccessToken = vkProfile.AccessToken });
-        _api.VkApiVersion.SetVersion(5,226);
+        _api.VkApiVersion.SetVersion(VkConst.VkApiMajor, VkConst.VkApiMinor);
         Ef.Update(vkProfile);
         await Ef.SaveChangesAsync();
 
