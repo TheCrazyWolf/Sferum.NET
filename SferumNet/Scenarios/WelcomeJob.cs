@@ -78,7 +78,7 @@ public class WelcomeJob : BaseJob
         }
     }
 
-    private async Task<string> GetSentencesAsync()
+    protected virtual async Task<string> GetSentencesAsync()
     {
         var countTotal = await Ef.WelcomeSentences.CountAsync();
         var randomIndex = new Random().Next(countTotal);

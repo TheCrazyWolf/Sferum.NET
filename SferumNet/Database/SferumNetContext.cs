@@ -18,7 +18,7 @@ public class SferumNetContext : DbContext
     public DbSet<WelcomeSentence> WelcomeSentences { get; set; }
     public DbSet<FactSentences> FactsSentences { get; set; }
     public DbSet<Job> Scenarios { get; set; }
-    public DbSet<FactJob> FloodsJobs { get; set; }
+    public DbSet<FactJob> FactJobs { get; set; }
     public DbSet<WelcomeJob> WelcomJobs { get; set; }
     public DbSet<ScheduleJob> SchedulesJobs { get; set; }
     public DbSet<Log> Logs { get; set; }

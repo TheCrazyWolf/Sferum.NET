@@ -34,9 +34,4 @@
       <Folder Include="Migrations\" />
     </ItemGroup>
 
-
-    <ItemGroup>
-      <AdditionalFiles Include="Components\Pages\Components\Job\ModalScWelcome.razor" />
-    </ItemGroup>
-
 </Project>

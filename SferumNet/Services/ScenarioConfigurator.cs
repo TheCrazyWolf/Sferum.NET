@@ -44,11 +44,18 @@ public class ScenarioConfigurator : IScenarioConfigurator
 
             foreach (var scenario in scenarios)
             {
-                if (scenario is DbModels.Scenarios.WelcomeJob)
+                if (scenario is WelcomeJob)
                     await Task.Run(() =>
                         new WelcomeJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
                                 scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
                             .ExecuteAsync(_cancelTokenSource.Token));
+                
+                if (scenario is FactJob)
+                    await Task.Run(() =>
+                        new FactsJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
+                                scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
+                            .ExecuteAsync(_cancelTokenSource.Token));
+                
                 
                 // ETC ...
             }

@@ -156,6 +156,9 @@ namespace SferumNet.Migrations
                 {
                     b.HasBaseType("SferumNet.DbModels.Common.Job");
 
+                    b.Property<bool>("IsShuffleWords")
+                        .HasColumnType("INTEGER");
+
                     b.HasDiscriminator().HasValue("FactJob");
                 });
 

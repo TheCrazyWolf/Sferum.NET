@@ -28,7 +28,7 @@
 <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined" NoIcon="true" Class="my-2">
     <MudIconButton Size="Size.Small" OnClick="OpenModalCreateJob" Icon="@Icons.Material.Outlined.Add"/>
     <MudIconButton Size="Size.Small" OnClick="() => OpenModalEditProfile()" Icon="@Icons.Material.Outlined.Edit"/>
-    <MudIconButton Size="Size.Small" OnClick="() => OpenModalDeleteProfile()" Icon="@Icons.Material.Outlined.PersonRemoveAlt1" Color="Color.Inherit"/>
+    <MudIconButton Size="Size.Small" OnClick="() => OpenModalDeleteProfile()" Icon="@Icons.Material.Outlined.RestoreFromTrash" Color="Color.Inherit"/>
 </MudAlert>
 
 @if (_scenarios != null)
@@ -126,6 +126,13 @@ else
         {
             var parameters = new DialogParameters<ModalWelcomJob> { { "Sc", new WelcomeJob { Id = job.Id } } };
             var dialog = await DialogService.ShowAsync<ModalWelcomJob>("Редактировать", parameters);
+            await dialog.Result;
+        }
+        
+        if (job is FactJob)
+        {
+            var parameters = new DialogParameters<ModalFactsJob> { { "Sc", new FactJob() { Id = job.Id } } };
+            var dialog = await DialogService.ShowAsync<ModalFactsJob>("Редактировать", parameters);
             await dialog.Result;
         }
 
