@@ -21,6 +21,7 @@
             <MudSlider @bind-Value="Sc.MaxToExecute" Min="1" Max="10000" Step="1" Color="Color.Primary">Макс. выполнений за день: @Sc.MaxToExecute</MudSlider>
             <MudSlider @bind-Value="Sc.Delay" Min="3000" Max="7200000" Step="1000" Color="Color.Primary">Задержка между выполнениями (милисикунды): @Sc.Delay</MudSlider>
         </MudAlert>
+        <MudSwitch @bind-Value="@Sc.IsActiveForWeekend" Label="Активен на выходные" Color="Color.Info"/>
         <MudSwitch @bind-Value="@Sc.IsActive" Label="Активен" Color="Color.Info"/>
     </DialogContent>
     <DialogActions>

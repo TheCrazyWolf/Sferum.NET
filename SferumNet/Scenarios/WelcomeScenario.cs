@@ -40,6 +40,9 @@ public class WelcomeScenario : BaseScenario
 
         if (CurrentScDb.TotalExecuted >= CurrentScDb.MaxToExecute)
             return false;
+
+        if (DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+            return CurrentScDb.IsActiveForWeekend;
         
         return CurrentScDb.IsActive;
     }

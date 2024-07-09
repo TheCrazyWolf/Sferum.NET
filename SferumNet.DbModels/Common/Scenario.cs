@@ -20,5 +20,7 @@ public class Scenario : Entity
     public int TotalExecuted { get; set; }
     public int MaxToExecute { get; set; } = 5;
     public int Delay { get; set; } = 5000;
+
+    public bool IsActiveForWeekend { get; set; } = false;
     public bool IsActive { get; set; } = true;
 }
