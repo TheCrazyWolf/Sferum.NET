@@ -1,0 +1,115 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using SamGK_Api.Interfaces.Client
+@using SferumNet.Components.Pages.Components.App
+@using SferumNet.Components.Pages.Components.Job.Common
+@using SferumNet.Components.Pages.Components.Vk
+@using SferumNet.Database
+@using SferumNet.DbModels.Scenarios
+
+@inject SferumNetContext Ef;
+@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="Sc.Title" Label="Название сценария" Variant="Variant.Outlined"></MudTextField>
+        <MudStack Row="true">
+            <MudTimePicker @bind-Time="TimeSpanStart" Variant="Variant.Outlined" Label="Старт" Editable="true"/>
+            <MudTimePicker @bind-Time="TimeSpanEnd" Variant="Variant.Outlined" Label="Конец" Editable="true"/>
+        </MudStack>
+        <MudStack Row="true">
+            <MudTextField @bind-Value="Sc.IdConversation" ReadOnly="true" Label="ID беседы" Variant="Variant.Outlined"></MudTextField>
+            <MudButton Class="mt-2" OnClick="OpenChooseConversation" Color="Color.Primary" Variant="Variant.Outlined">Выбрать</MudButton>
+        </MudStack>
+        <MudStack Row="true">
+            <MudTextField @bind-Value="Sc.TypeSchedule" ReadOnly="true" Label="Тип расписания" Variant="Variant.Outlined"></MudTextField>
+            <MudTextField @bind-Value="Sc.Value" ReadOnly="true" Label="Значение" Variant="Variant.Outlined"></MudTextField>
+            <MudButton Class="mt-2" OnClick="OpenChooseValues" Color="Color.Primary" Variant="Variant.Outlined">Выбрать</MudButton>
+        </MudStack>
+        <MudAlert Class="mt-4" Variant="Variant.Outlined" Severity="Severity.Warning">Соблюдайте разумный интервал как для частоты запросов в день и между ними. Частые запросы могут привести к блокировке аккаунтаы</MudAlert>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="my-2">
+            <MudSlider @bind-Value="Sc.MaxToExecute" Min="1" Max="2000" Step="1" Color="Color.Primary">Макс. выполнений за день: @Sc.MaxToExecute</MudSlider>
+            <MudSlider @bind-Value="Sc.Delay" Min="3000" Max="7200000" Step="1000" Color="Color.Primary">Задержка между выполнениями (милисикунды): @Sc.Delay</MudSlider>
+        </MudAlert>
+        <MudSwitch @bind-Value="@Sc.IsAddedNextDay" Label="Отправлять расписание на завтра" Color="Color.Info"/>
+        <MudSwitch @bind-Value="@Sc.IsActiveForWeekend" Label="Активен на выходные" Color="Color.Info"/>
+        <MudSwitch @bind-Value="@Sc.IsActive" Label="Активен" Color="Color.Info"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Закрыть</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public ScheduleJob Sc { get; set; } = new();
+
+    TimeSpan? TimeSpanStart
+    {
+        get => Sc.TimeStart;
+        set => Sc.TimeStart = value ?? new TimeSpan(07, 00, 00);
+    }
+
+    TimeSpan? TimeSpanEnd
+    {
+        get => Sc.TimeEnd;
+        set => Sc.TimeEnd = value ?? new TimeSpan(21, 00, 00);
+    }
+
+    private async void Submit()
+    {
+        if (Sc.Id is 0)
+            await Add();
+        else
+            await Save();
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Sc.Id is not 0)
+            Sc = await Ef.SchedulesJobs.FirstOrDefaultAsync(x => x.Id == Sc.Id) ?? new ScheduleJob();
+    }
+
+    private async Task Save()
+    {
+        Ef.Update(Sc);
+        await Ef.SaveChangesAsync();
+        MudDialog.Close();
+    }
+
+    private async Task Add()
+    {
+        await Ef.AddAsync(Sc);
+        await Ef.SaveChangesAsync();
+        MudDialog.Close();
+    }
+
+    private async Task OpenChooseConversation()
+    {
+        var parameters = new DialogParameters<ModalChooseConversation> { { "IdProfile", Sc.IdProfile } };
+        var dialog = await DialogService.ShowAsync<ModalChooseConversation>("Выберите диалог", parameters);
+        var result = await dialog.Result;
+
+        if (result.Data is null)
+            return;
+
+        Sc.IdConversation = (long)result.Data;
+    }
+    
+    private async Task OpenChooseValues()
+    {
+        var dialog = await DialogService.ShowAsync<ModalChooseShedule>("Выберите значение");
+        var result = await dialog.Result;
+        
+        if(result.Data is null)
+            return;
+
+        Sc.TypeSchedule = (result.Data as ScheduleResult).Type;
+        Sc.Value = (result.Data as ScheduleResult).Value;
+    }
+
+}

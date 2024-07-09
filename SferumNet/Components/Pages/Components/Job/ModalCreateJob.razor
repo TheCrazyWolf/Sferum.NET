@@ -47,6 +47,13 @@
             var dialog = await DialogService.ShowAsync<ModalFactsJob>("Новый сценарий", parameters);
             await dialog.Result;
         }
+        
+        if (_selectedJob is EnumJob.Schedule)
+        {
+            var parameters = new DialogParameters<ModalScheduleJob> { { "Sc", new ScheduleJob() { IdProfile = IdProfile } } };
+            var dialog = await DialogService.ShowAsync<ModalScheduleJob>("Новый сценарий", parameters);
+            await dialog.Result;
+        }
 
         MudDialog.Close();
     }

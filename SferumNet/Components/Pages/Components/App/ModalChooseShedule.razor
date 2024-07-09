@@ -1,0 +1,96 @@
+@using SamGK_Api
+@using SamGK_Api.Interfaces.Client
+@using SamGK_Api.Interfaces.Groups
+@using SamGK_Api.Models.Account
+@using SamGK_Api.Models.Cabs
+@using SamGK_Api.Models.Group
+@using SferumNet.Components.Pages.Components.Job.Common
+@using SferumNet.Scenarios.Extensions
+
+@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        <MudSelect Label="Тип расписания"
+                   @bind-Value="@SheduleType"
+                   AnchorOrigin="Origin.BottomCenter">
+            @foreach (var item in Enum.GetValues(typeof(SheduleSearchType)).Cast<SheduleSearchType>())
+            {
+                <MudSelectItem T="SheduleSearchType" Value="item">@item</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect Label="Значение"
+                   @bind-Value="@_selectedValue"
+                   AnchorOrigin="Origin.BottomCenter">
+            @foreach (var item in _values)
+            {
+                if (item is Group groupUpcasted)
+                {
+                    <MudSelectItem T="object" Value="groupUpcasted.Id">@groupUpcasted.Name</MudSelectItem>
+                }
+                else if (item is Cab cabUpcasted)
+                {
+                    <MudSelectItem T="object" Value="cabUpcasted.Name">@cabUpcasted.Name</MudSelectItem>
+                }
+                else if (item is Employee teacherUpcasted)
+                {
+                    <MudSelectItem T="object" Value="teacherUpcasted.Id">@teacherUpcasted.Name</MudSelectItem>
+                }
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Закрыть</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Select">Выбрать</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly ClientSamgk _samgk = new();
+
+    private SheduleSearchType _selectedTypeSchedule = SheduleSearchType.Employee;
+    
+    public SheduleSearchType SheduleType
+    {
+        get => _selectedTypeSchedule;
+        set
+        {
+            _selectedTypeSchedule = value;
+            LoadValuesAsync(value);
+        }
+    }
+    
+    private List<object> _values = new();
+    private object _selectedValue;
+
+    private void Cancel() => MudDialog.Cancel();
+
+
+    protected override Task OnInitializedAsync()
+    {
+        SheduleType = SheduleSearchType.Employee;
+        return Task.CompletedTask;
+    }
+
+    private async Task LoadValuesAsync(SheduleSearchType selected)
+    {
+        if (selected is SheduleSearchType.Cab)
+            _values = new List<object>(await _samgk.Cabs.GetCabsAsync());
+        
+        if (selected is SheduleSearchType.Group)
+            _values = new List<object>(await _samgk.Groups.GetGroupsAsync());
+        
+        if (selected is SheduleSearchType.Employee)
+            _values = new List<object>(await _samgk.Accounts.GetEmployeesAsync());
+    }
+
+    private void Select()
+    {
+        MudDialog.Close(new ScheduleResult { Type = _selectedTypeSchedule, Value = _selectedValue.ToString()});
+    }
+
+}

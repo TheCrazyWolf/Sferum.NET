@@ -56,6 +56,12 @@ public class ScenarioConfigurator : IScenarioConfigurator
                                 scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
                             .ExecuteAsync(_cancelTokenSource.Token));
                 
+                if (scenario is ScheduleJob)
+                    await Task.Run(() =>
+                        new SchedulesJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
+                                scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
+                            .ExecuteAsync(_cancelTokenSource.Token));
+                
                 
                 // ETC ...
             }

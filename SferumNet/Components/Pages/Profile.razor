@@ -135,6 +135,13 @@ else
             var dialog = await DialogService.ShowAsync<ModalFactsJob>("Редактировать", parameters);
             await dialog.Result;
         }
+        
+        if (job is ScheduleJob)
+        {
+            var parameters = new DialogParameters<ModalScheduleJob> { { "Sc", new ScheduleJob() { Id = job.Id } } };
+            var dialog = await DialogService.ShowAsync<ModalScheduleJob>("Редактировать", parameters);
+            await dialog.Result;
+        }
 
         // ETC
 

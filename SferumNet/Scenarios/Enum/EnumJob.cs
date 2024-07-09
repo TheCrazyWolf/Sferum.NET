@@ -7,5 +7,7 @@ public enum EnumJob
     [Display(Name = "Приветствие")]
     Welcome,
     [Display(Name = "Интересные факты")]
-    Facts
+    Facts,
+    [Display(Name = "Расписание (СГК)")]
+    Schedule
 }
