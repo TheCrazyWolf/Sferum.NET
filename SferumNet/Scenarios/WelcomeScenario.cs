@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SferumNet.Configs;
 using SferumNet.DbModels.Enum;
 using SferumNet.Scenarios.Common;
@@ -54,7 +55,7 @@ public class WelcomeScenario : BaseScenario
             {
                 { "peer_id", CurrentScDb.IdConversation },
                 { "random_id", new Random().Next() },
-                { "message", new Random().Next() }
+                { "message", await GetSentencesAsync() }
             };
 
             VkApi.Call("messages.send", parameters);
@@ -71,6 +72,19 @@ public class WelcomeScenario : BaseScenario
             
             await Logger.LogAsync(IdScenario, EventType.Error, $"Ошибка при выполнении скрипта\n{e.Message}");
         }
+    }
+
+    private async Task<string> GetSentencesAsync()
+    {
+        var countTotal = await Ef.WelcomeSentences.CountAsync();
+        var randomIndex = new Random().Next(countTotal);
+            
+        var thisSentence = await Ef.WelcomeSentences
+            .OrderBy(w => w.Id) 
+            .Skip(randomIndex)
+            .FirstOrDefaultAsync();
+
+        return thisSentence is null ? "База данных предложений не заполнена" : thisSentence.Message;
     }
 
     public WelcomeScenario(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
