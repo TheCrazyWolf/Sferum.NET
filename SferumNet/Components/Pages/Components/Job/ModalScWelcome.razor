@@ -82,7 +82,7 @@
     private async Task OpenChooseConversation()
     {
         var parameters = new DialogParameters<ModalChooseConversation> { { "IdProfile", Sc.IdProfile } };
-        var dialog = await DialogService.ShowAsync<ModalChooseConversation>("Настройка профиля", parameters);
+        var dialog = await DialogService.ShowAsync<ModalChooseConversation>("Выберите диалог", parameters);
         var result = await dialog.Result;
 
         if (result.Data is null)

@@ -25,6 +25,8 @@
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
+    [Parameter] public long IdProfile { get; set; }
+
     private EnumScenario _selectedJob = EnumScenario.Welcome;
 
     private void Cancel() => MudDialog.Cancel();
@@ -33,7 +35,7 @@
     {
         if (_selectedJob is EnumScenario.Welcome)
         {
-            var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome() } };
+            var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome() { IdProfile = IdProfile } } };
             var dialog = await DialogService.ShowAsync<ModalScWelcome>("Новый сценарий", parameters);
             await dialog.Result;
         }

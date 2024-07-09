@@ -21,7 +21,7 @@
 
 
 <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined" NoIcon="true" Class="my-2">
-    <MudAvatar Color="Color.Primary">@_currentProfile.Name.FirstOrDefault()</MudAvatar>   Профиль пользователя: @_currentProfile.Name
+    <MudAvatar Color="Color.Primary">@_currentProfile.Name.FirstOrDefault()</MudAvatar> Профиль пользователя: @_currentProfile.Name
 </MudAlert>
 
 <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined" NoIcon="true" Class="my-2">
@@ -53,7 +53,7 @@
                         @foreach (var log in GetLogsAsync(scenario.Id).GetAwaiter().GetResult())
                         {
                             string buildStrLabel = $"{log.DateTime} {log.Type}";
-                            <MudTextField T="string" ReadOnly="true" Label="@buildStrLabel" Variant="Variant.Filled" Text="@log.Message" Lines="1" Adornment="Adornment.End"/>
+                            <MudTextField T="string" ReadOnly="true" FullWidth="true" Label="@buildStrLabel" Variant="Variant.Filled" Text="@log.Message" Lines="1" Adornment="Adornment.End"/>
                         }
                     </MudTabPanel>
                 </MudTabs>
@@ -68,8 +68,8 @@ else
 
 @code {
 
-    [Parameter] [SupplyParameterFromQuery] public int Id { get; set; }
-    private VkProfile _currentProfile = new VkProfile();
+    [Parameter] [SupplyParameterFromQuery] public long Id { get; set; }
+    private VkProfile _currentProfile = new();
     private ICollection<Scenario>? _scenarios;
 
     protected override async Task OnInitializedAsync()
@@ -111,7 +111,8 @@ else
 
     private async void OpenModalCreateSc()
     {
-        var dialog = await DialogService.ShowAsync<ModalCreateJob>("Выберите шаблон");
+        var parameters = new DialogParameters<ModalCreateJob> { { "IdProfile", Id } };
+        var dialog = await DialogService.ShowAsync<ModalCreateJob>("Выберите шаблон", parameters);
         await dialog.Result;
         await OpenModalRestartService();
         RefreshPage();
