@@ -1,8 +1,8 @@
 ﻿@page "/profile"
 @using Microsoft.EntityFrameworkCore
 @using SferumNet.Components.Pages.Components.App
+@using SferumNet.Components.Pages.Components.Job
 @using SferumNet.Components.Pages.Components.Vk
-@using SferumNet.Components.Pages.ModalsSc
 @using SferumNet.Configs
 @using SferumNet.Database
 @using SferumNet.DbModels.Common
@@ -111,8 +111,7 @@ else
 
     private async void OpenModalCreateSc()
     {
-        var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome { IdProfile = Id } } };
-        var dialog = await DialogService.ShowAsync<ModalScWelcome>("Новый сценарий", parameters);
+        var dialog = await DialogService.ShowAsync<ModalCreateJob>("Выберите шаблон");
         await dialog.Result;
         await OpenModalRestartService();
         RefreshPage();
