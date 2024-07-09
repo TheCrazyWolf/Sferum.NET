@@ -26,7 +26,7 @@
 </MudAlert>
 
 <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined" NoIcon="true" Class="my-2">
-    <MudIconButton Size="Size.Small" OnClick="OpenModalCreateSc" Icon="@Icons.Material.Outlined.Add"/>
+    <MudIconButton Size="Size.Small" OnClick="OpenModalCreateJob" Icon="@Icons.Material.Outlined.Add"/>
     <MudIconButton Size="Size.Small" OnClick="() => OpenModalEditProfile()" Icon="@Icons.Material.Outlined.Edit"/>
     <MudIconButton Size="Size.Small" OnClick="() => OpenModalDeleteProfile()" Icon="@Icons.Material.Outlined.PersonRemoveAlt1" Color="Color.Inherit"/>
 </MudAlert>
@@ -110,7 +110,7 @@ else
             await ScenarioConfigurator.RestartAsync();
     }
 
-    private async void OpenModalCreateSc()
+    private async void OpenModalCreateJob()
     {
         var parameters = new DialogParameters<ModalCreateJob> { { "IdProfile", Id } };
         var dialog = await DialogService.ShowAsync<ModalCreateJob>("Выберите шаблон", parameters);

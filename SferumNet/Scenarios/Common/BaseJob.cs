@@ -23,7 +23,7 @@ public class BaseJob : IJob
     protected readonly VkApi VkApi;
 
     protected VkProfile? CurrentProfileDb;
-    protected Job? CurrentScDb;
+    protected Job? CurrentJob;
 
     public BaseJob(SferumNetContext ef, DbLogger dbLogger, long idScenario)
     {
@@ -65,12 +65,12 @@ public class BaseJob : IJob
 
     protected async Task UpdateProfileAndScAsync()
     {
-        CurrentScDb = await GetScenarioAsync(IdScenario);
+        CurrentJob = await GetScenarioAsync(IdScenario);
 
-        if (CurrentScDb is null)
+        if (CurrentJob is null)
             return;
 
-        CurrentProfileDb = await GetProfileAsync(CurrentScDb.IdProfile);
+        CurrentProfileDb = await GetProfileAsync(CurrentJob.IdProfile);
         await ConfigureVkApiAsync();
     }
 
@@ -102,14 +102,15 @@ public class BaseJob : IJob
 
     protected async Task ResetCounterExecutedIfNextDayAsync()
     {
-        if (CurrentScDb is null)
+        if (CurrentJob is null)
             return;
 
-        if (CurrentScDb.LastExecuted.Date != DateTime.Today.Date)
+        if (CurrentJob.LastExecuted.Date != DateTime.Today.Date)
         {
             await Logger.LogAsync(IdScenario, EventType.Info, "День прошел. Сбрасываем счётчик");
-            CurrentScDb.TotalExecuted = 0;
-            Ef.Update(CurrentScDb);
+            CurrentJob.TotalExecuted = 0;
+            CurrentJob.LastExecuted = DateTime.Now;
+            Ef.Update(CurrentJob);
             await Ef.SaveChangesAsync(CancellationToken);
         }
     }
@@ -117,12 +118,12 @@ public class BaseJob : IJob
 
     protected async Task ProccessIncrementExecutedAsync()
     {
-        if (CurrentScDb is null)
+        if (CurrentJob is null)
             return;
 
-        CurrentScDb.TotalExecuted++;
-        CurrentScDb.LastExecuted = DateTime.Now;
-        Ef.Update(CurrentScDb);
+        CurrentJob.TotalExecuted++;
+        CurrentJob.LastExecuted = DateTime.Now;
+        Ef.Update(CurrentJob);
         await Ef.SaveChangesAsync(CancellationToken);
 
         await Logger.LogAsync(IdScenario, EventType.Success, $"Сценарий успешно выполнен");

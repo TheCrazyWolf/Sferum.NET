@@ -25,7 +25,7 @@ public class WelcomeJob : BaseJob
                 continue;
             
             await ProcessAsync();
-            await Task.Delay(CurrentScDb?.Delay ?? ScConst.DelayDefault, cancellationToken);
+            await Task.Delay(CurrentJob?.Delay ?? ScConst.DelayDefault, cancellationToken);
         }
         
         await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий завершен");
@@ -33,31 +33,31 @@ public class WelcomeJob : BaseJob
 
     public override bool CanBeExecuted()
     {
-        if (CurrentScDb is null || CurrentProfileDb is null)
+        if (CurrentJob is null || CurrentProfileDb is null)
             return false;
         
-        if (!(DateTime.Now.TimeOfDay >= CurrentScDb.TimeStart && DateTime.Now.TimeOfDay <= CurrentScDb.TimeEnd))
+        if (!(DateTime.Now.TimeOfDay >= CurrentJob.TimeStart && DateTime.Now.TimeOfDay <= CurrentJob.TimeEnd))
             return false;
 
-        if (CurrentScDb.TotalExecuted >= CurrentScDb.MaxToExecute)
+        if (CurrentJob.TotalExecuted >= CurrentJob.MaxToExecute)
             return false;
 
         if (DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-            return CurrentScDb.IsActiveForWeekend;
+            return CurrentJob.IsActiveForWeekend;
         
-        return CurrentScDb.IsActive;
+        return CurrentJob.IsActive;
     }
 
     public override async Task ProcessAsync()
     {
-        if (CurrentScDb is null || CurrentProfileDb is null)
+        if (CurrentJob is null || CurrentProfileDb is null)
             return;
         
         try
         {
             var parameters = new VkParameters
             {
-                { "peer_id", CurrentScDb.IdConversation },
+                { "peer_id", CurrentJob.IdConversation },
                 { "random_id", new Random().Next() },
                 { "message", await GetSentencesAsync() }
             };

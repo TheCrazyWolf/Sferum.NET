@@ -40,6 +40,8 @@
             var dialog = await DialogService.ShowAsync<ModalWelcomJob>("Новый сценарий", parameters);
             await dialog.Result;
         }
+
+        MudDialog.Close();
     }
 
 }
