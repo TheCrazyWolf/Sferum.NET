@@ -2,6 +2,9 @@
 @using SferumNet.Components.Pages.Components
 @using SferumNet.DbModels.Vk
 @using SferumNet.Services.Common
+
+@inject NavigationManager Navigation;
+
 <MudNavMenu>
     <MudNavLink Href="/home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ElectricalServices">Служба запущена: @_scSerivce.DateTimeStarted</MudNavLink>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
@@ -10,8 +13,7 @@
     {
         @foreach (var currentProfile in Profiles)
         {
-            var url = $"/profile?id={currentProfile.Id}";
-            <MudNavLink Href="@url" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">@currentProfile.Name</MudNavLink>
+            <MudNavLink OnClick="() => OpenProfile(currentProfile.Id)" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">@currentProfile.Name</MudNavLink>
         }
     }
     else
@@ -37,6 +39,11 @@
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         DialogService.Show<ModalAddProfile>("Настройка профиля", options);
+    }
+
+    private void OpenProfile(long idProfile)
+    {
+        Navigation.NavigateTo($"/profile?id={idProfile}", true);
     }
 
 }

@@ -3,6 +3,7 @@
 @using SferumNet.Components.Modal
 @using SferumNet.Components.Pages.Components
 @using SferumNet.Components.Pages.ModalsSc
+@using SferumNet.Configs
 @using SferumNet.DbModels.Common
 @using SferumNet.DbModels.Enum
 @using SferumNet.DbModels.Scenarios
@@ -42,13 +43,11 @@
                         <MudButton OnClick="() => OpenModalDeleteSc(scenario)" Variant="Variant.Outlined" Color="Color.Primary">Удалить</MudButton>
                     </MudTabPanel>
                     <MudTabPanel Text="Статистика">
-                        @{
-                            var s = GetStatsLabels();
-                            var charts = GetStatsCharts(scenario.Id);
-                            <MudChart ChartType="ChartType.Line" ChartSeries="charts" XAxisLabels="s" Width="100%" Height="450px"/>
-                        }
+                        <MudText>Статистика за последние @ChartConst.DefaultDaysByChar дней</MudText>
+                        <MudChart ChartType="ChartType.Line" ChartSeries="@GetStatsCharts(scenario.Id)" XAxisLabels="@GetStatsLabels()" Width="100%" Height="450px"/>
                     </MudTabPanel>
                     <MudTabPanel Text="Логи">
+                        <MudText>Показаны последние события</MudText>
                         @foreach (var log in GetLogsAsync(scenario.Id).GetAwaiter().GetResult())
                         {
                             string buildStrLabel = $"{log.DateTime} {log.Type}";
@@ -160,8 +159,7 @@ else
     private double[] GetCountLogByType(long idSc, EventType logType)
     {
         var data = new List<double>();
-        var days = 14;
-        for (int i = 0; i < days; i++)
+        for (int i = 0; i < ChartConst.DefaultDaysByChar; i++)
         {
             data.Add(Ef.Logs.Count(x => x.IdScenario == idSc && x.DateTime.Date == DateTime.Now.AddDays(-i).Date && x.Type == logType));
         }
@@ -171,9 +169,8 @@ else
 
     private string[] GetStatsLabels()
     {
-        var days = 14;
         var labels = new List<string>();
-        for (int i = 0; i < days; i++)
+        for (int i = 0; i < ChartConst.DefaultDaysByChar; i++)
         {
             labels.Add(DateTime.Now.AddDays(-i).ToString("dd.MM"));
         }
