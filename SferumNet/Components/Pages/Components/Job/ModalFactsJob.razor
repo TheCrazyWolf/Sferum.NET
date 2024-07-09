@@ -19,7 +19,7 @@
         </MudStack>
         <MudAlert Class="mt-4" Variant="Variant.Outlined" Severity="Severity.Warning">Соблюдайте разумный интервал как для частоты запросов в день и между ними. Частые запросы могут привести к блокировке аккаунтаы</MudAlert>
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="my-2">
-            <MudSlider @bind-Value="Sc.MaxToExecute" Min="1" Max="10000" Step="1" Color="Color.Primary">Макс. выполнений за день: @Sc.MaxToExecute</MudSlider>
+            <MudSlider @bind-Value="Sc.MaxToExecute" Min="1" Max="2000" Step="1" Color="Color.Primary">Макс. выполнений за день: @Sc.MaxToExecute</MudSlider>
             <MudSlider @bind-Value="Sc.Delay" Min="3000" Max="7200000" Step="1000" Color="Color.Primary">Задержка между выполнениями (милисикунды): @Sc.Delay</MudSlider>
         </MudAlert>
         <MudSwitch @bind-Value="@Sc.IsShuffleWords" Label="Перемешивать слова в предложении" Color="Color.Info"/>

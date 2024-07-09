@@ -211,10 +211,10 @@ else
         RefreshPage();
     }
 
-    private async Task ProccessToDeleteJobAsync(long idSc)
+    private async Task ProccessToDeleteJobAsync(long idJob)
     {
         var scDb = await Ef.Scenarios
-            .FirstOrDefaultAsync(x => x.Id == idSc);
+            .FirstOrDefaultAsync(x => x.Id == idJob);
 
         if (scDb is null)
             return;
