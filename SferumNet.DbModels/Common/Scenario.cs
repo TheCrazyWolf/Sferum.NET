@@ -18,7 +18,7 @@ public class Scenario : Entity
     public DateTime LastExecuted { get; set; }
     
     public int TotalExecuted { get; set; }
-    public int MaxToExecute { get; set; }
-    public int Delay { get; set; }
+    public int MaxToExecute { get; set; } = 5;
+    public int Delay { get; set; } = 5000;
     public bool IsActive { get; set; } = true;
 }
