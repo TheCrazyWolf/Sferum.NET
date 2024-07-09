@@ -21,4 +21,14 @@ public class SferumNetContext : DbContext
         optionsBuilder.UseSqlite("Data Source = LocalStorage.db");
         base.OnConfiguring(optionsBuilder);
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Log>()
+            .HasOne(x=> x.Scenario)
+            .WithMany()
+            .HasForeignKey(l => l.IdScenario)
+            .OnDelete(DeleteBehavior.SetNull);
+        
+    }
 }

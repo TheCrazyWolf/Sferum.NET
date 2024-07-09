@@ -116,9 +116,14 @@ else
         Navigation.NavigateTo($"/profile?id={Id}", true);
     }
 
-    private async Task<IReadOnlyList<Log>> GetLogsAsync(long IdSc)
+    private async Task<IReadOnlyList<Log>> GetLogsAsync(long idSc)
     {
-        return await Ef.Logs.Where(x => x.IdScenario == Id).OrderByDescending(x => x.DateTime).Take(75).ToListAsync();
+        var result=  await Ef.Logs.Where(x => x.IdScenario == idSc)
+            .OrderByDescending(x => x.DateTime)
+            .Take(75)
+            .ToListAsync();
+
+        return result;
     }
 
     private async Task OpenModalDeleteSc(Scenario scenario)
@@ -137,7 +142,8 @@ else
 
     private async Task ProccessToDeleteAsync(long idSc)
     {
-        var scDb = await Ef.Scenarios.FirstOrDefaultAsync(x => x.Id == idSc);
+        var scDb = await Ef.Scenarios
+            .FirstOrDefaultAsync(x => x.Id == idSc);
 
         if (scDb is null)
             return;

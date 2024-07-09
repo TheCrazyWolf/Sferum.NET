@@ -82,8 +82,8 @@
             return false;
 
         vkProfile.AccessToken = account.AccessToken;
-        vkProfile.AccessTokenExpired = account.Expires;
-        
+        //vkProfile.AccessTokenExpired = account.Expires;
+        vkProfile.AccessTokenExpired = DateTime.Now.AddMinutes(10).Ticks;
         await _api.AuthorizeAsync(new ApiAuthParams { AccessToken = vkProfile.AccessToken });
         _api.VkApiVersion.SetVersion(5,226);
         Ef.Update(vkProfile);

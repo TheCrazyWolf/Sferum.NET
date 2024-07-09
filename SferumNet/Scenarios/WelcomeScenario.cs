@@ -2,6 +2,7 @@ using SferumNet.DbModels.Enum;
 using SferumNet.Scenarios.Common;
 using SferumNet.Services;
 using VkNet.Model;
+using VkNet.Utils;
 
 namespace SferumNet.Scenarios;
 
@@ -15,11 +16,12 @@ public class WelcomeScenario : BaseScenario
         {
             await UpdateProfileAndScAsync();
             
+            await ResetCounterExecutedIfNextDayAsync();
+            
             if(!CanBeExecuted())
                 continue;
 
             await RefreshIfTokenExpireAsync();
-            await ResetCounterExecutedIfNextDayAsync();
             await ProcessAsync();
             await Task.Delay(_currentScDb?.Delay ?? 5000, cancellationToken);
         }
@@ -47,13 +49,15 @@ public class WelcomeScenario : BaseScenario
         
         try
         {
-            
-            VkApi.Messages.Send(new MessagesSendParams
+
+            var parametrs = new VkParameters
             {
-                PeerId = _currentScDb.IdConversation,
-                RandomId = new Random().Next()
-            });
-            
+                { "peer_id", _currentScDb.IdConversation },
+                { "random_id", new Random().Next() },
+                { "message", new Random().Next() }
+            };
+
+            var result = VkApi.Call("messages.send", parametrs);
             await ProccessInrecementExecutedAsync();
         }
         catch (Exception e)

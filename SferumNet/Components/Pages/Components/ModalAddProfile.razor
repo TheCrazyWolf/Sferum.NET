@@ -71,7 +71,8 @@
         var obj = (ResponceProfileWebToken)resultDialog.Data;
         Profile.AccessToken = obj.AccessToken;
         Profile.UserId = obj.UserId;
-        Profile.AccessTokenExpired = obj.Expires;
+        //Profile.AccessTokenExpired = obj.Expires;
+        Profile.AccessTokenExpired = DateTime.Now.AddMinutes(10).Ticks;
         await Ef.AddAsync(Profile);
         await Ef.SaveChangesAsync();
 

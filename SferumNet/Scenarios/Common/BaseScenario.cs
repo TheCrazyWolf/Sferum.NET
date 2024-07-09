@@ -13,17 +13,17 @@ public class BaseScenario : IScenario
 {
     protected readonly long IdScenario;
     protected CancellationToken CancellationToken;
-    
+
     /* Services */
     protected readonly DbLogger Logger;
     private readonly VkRemixFactory _vkRemixFactory;
-    
+
     protected readonly SferumNetContext Ef;
-    protected readonly VkApi VkApi; 
-    
+    protected readonly VkApi VkApi;
+
     protected VkProfile? _currentProfileDb;
     protected Scenario? _currentScDb;
-    
+
     public BaseScenario(SferumNetContext ef, DbLogger dbLogger, long idScenario)
     {
         Ef = ef;
@@ -33,7 +33,7 @@ public class BaseScenario : IScenario
         VkApi = new VkApi();
         _vkRemixFactory = new VkRemixFactory();
     }
-    
+
     public virtual async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         CancellationToken = cancellationToken;
@@ -68,7 +68,7 @@ public class BaseScenario : IScenario
 
         if (_currentScDb is null)
             return;
-        
+
         _currentProfileDb = await GetProfileAsync(_currentScDb.IdProfile);
     }
 
@@ -76,13 +76,13 @@ public class BaseScenario : IScenario
     {
         if (_currentProfileDb is null)
             return;
-        
+
         if (_currentProfileDb.AccessTokenExpired <= DateTime.Now.Ticks)
         {
             await ConfigureVkApiAsync();
-            
+
             await Logger.LogAsync(IdScenario, EventType.Info, "Срок действия токена истек. Запрашиваем новый");
-            
+
             var accounts = await _vkRemixFactory.GetAccountsAsync(_currentProfileDb.RemixSid);
 
             var webTokenAccount = accounts?.FirstOrDefault(x => x.UserId == _currentProfileDb.UserId);
@@ -95,8 +95,8 @@ public class BaseScenario : IScenario
 
             _currentProfileDb.AccessTokenExpired = webTokenAccount.Expires;
             _currentProfileDb.UserId = webTokenAccount.UserId;
-            _currentProfileDb.AccessToken = webTokenAccount.AccessToken;
-
+            // _currentProfileDb.AccessToken = webTokenAccount.AccessToken;
+            _currentProfileDb.AccessTokenExpired = DateTime.Now.AddMinutes(10).Ticks;
             Ef.Update(_currentProfileDb);
             await Ef.SaveChangesAsync(CancellationToken);
         }
@@ -104,7 +104,7 @@ public class BaseScenario : IScenario
 
     protected async Task ResetCounterExecutedIfNextDayAsync()
     {
-        if(_currentScDb is null)
+        if (_currentScDb is null)
             return;
 
         if (_currentScDb.LastExecuted.Date != DateTime.Today.Date)
@@ -119,20 +119,20 @@ public class BaseScenario : IScenario
 
     protected async Task ProccessInrecementExecutedAsync()
     {
-        if(_currentScDb is null)
+        if (_currentScDb is null)
             return;
-        
+
         _currentScDb.TotalExecuted++;
         _currentScDb.LastExecuted = DateTime.Now;
         Ef.Update(_currentScDb);
         await Ef.SaveChangesAsync(CancellationToken);
-        
+
         await Logger.LogAsync(IdScenario, EventType.Success, $"Сценарий успешно выполнен");
     }
 
     private async Task ConfigureVkApiAsync()
     {
-        VkApi.VkApiVersion.SetVersion(5,226);
+        VkApi.VkApiVersion.SetVersion(5, 235);
 
         if (_currentProfileDb is null)
             return;
