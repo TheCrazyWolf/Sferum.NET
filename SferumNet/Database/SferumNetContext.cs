@@ -9,6 +9,11 @@ namespace SferumNet.Database;
 
 public class SferumNetContext : DbContext
 {
+    public SferumNetContext()
+    {
+        Database.MigrateAsync();
+    }
+    
     public DbSet<VkProfile> VkProfiles { get; set; }
     public DbSet<WelcomeSentence> WelcomeSentences { get; set; }
     public DbSet<FactSentences> FactsSentences { get; set; }
