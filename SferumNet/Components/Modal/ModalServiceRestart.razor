@@ -1,0 +1,20 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Перезапуск службы
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>Вы внесли изменения в настройках сценариев. Для применения и активации новых настроек необходимо перезапустить службу</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="() => MudDialog.Close(true)">Перезапустить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private MudDialogInstance MudDialog { get; set; } = default!;
+
+    private void Cancel() => MudDialog.Cancel();
+}

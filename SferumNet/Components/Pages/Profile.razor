@@ -8,10 +8,12 @@
 @using SferumNet.DbModels.Scenarios
 @using SferumNet.DbModels.Services
 @using SferumNet.DbModels.Vk
+@using SferumNet.Services.Common
 
 @inject IDialogService DialogService
 @inject SferumNetContext Ef;
 @inject NavigationManager Navigation;
+@inject IScenarioConfigurator ScenarioConfigurator;
 
 <PageTitle>Сценарии пользователя: @_currentProfile.Name</PageTitle>
 
@@ -90,14 +92,28 @@ else
         var parameters = new DialogParameters<ModalAddProfile> { { "Profile", new VkProfile { Id = Id } } };
         var dialog = await DialogService.ShowAsync<ModalAddProfile>("Настройка профиля", parameters);
         await dialog.Result;
+        await OpenModalRestartService();
         RefreshPage();
     }
 
+    private async Task OpenModalRestartService()
+    {
+        var dialog = await DialogService.ShowAsync<ModalServiceRestart>();
+        var result = await dialog.Result;
+        
+        if(result.Data is null)
+            return;
+
+        if ((bool)result.Data)
+            await ScenarioConfigurator.RestartAsync();
+    }
+    
     private async void OpenModalCreateSc()
     {
         var parameters = new DialogParameters<ModalScWelcome> { { "Sc", new Welcome { IdProfile = Id } } };
         var dialog = await DialogService.ShowAsync<ModalScWelcome>("Новый сценарий", parameters);
         await dialog.Result;
+        await OpenModalRestartService();
         RefreshPage();
     }
 
@@ -113,6 +129,7 @@ else
 
         // ETC
 
+        await OpenModalRestartService();
         RefreshPage();
     }
 

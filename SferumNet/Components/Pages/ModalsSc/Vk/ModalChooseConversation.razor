@@ -14,9 +14,12 @@
         }
         else
         {
-            <MudRadioGroup @bind-Value="@IdConversion">
+            <MudRadioGroup @bind-Value="@_idConversion">
                 @foreach (var item in _conversationsResult.Items)
                 {
+                    /* Почему то некотоыре диалоги null и все падает типо крч пропустим
+                     вроде типа личные сообщения
+                     */
                     if(item.Conversation.ChatSettings is null)
                         continue;
                     
@@ -39,12 +42,12 @@
     [Parameter] public long IdProfile { get; set; }
 
     private GetConversationsResult? _conversationsResult;
-    private VkApi _api = new();
-    private long IdConversion;
+    private readonly VkApi _api = new();
+    private long _idConversion;
 
     private void Submit()
     {
-        MudDialog.Close(IdConversion);
+        MudDialog.Close(_idConversion);
     }
 
     private void Cancel() => MudDialog.Cancel();
@@ -82,7 +85,6 @@
             return false;
 
         vkProfile.AccessToken = account.AccessToken;
-        //vkProfile.AccessTokenExpired = account.Expires;
         vkProfile.AccessTokenExpired = DateTime.Now.AddMinutes(10).Ticks;
         await _api.AuthorizeAsync(new ApiAuthParams { AccessToken = vkProfile.AccessToken });
         _api.VkApiVersion.SetVersion(5,226);
