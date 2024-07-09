@@ -5,7 +5,7 @@ using SferumNet.DbModels.Scenarios;
 using SferumNet.DbModels.Services;
 using SferumNet.DbModels.Vk;
 
-namespace SferumNet;
+namespace SferumNet.Database;
 
 public class SferumNetContext : DbContext
 {

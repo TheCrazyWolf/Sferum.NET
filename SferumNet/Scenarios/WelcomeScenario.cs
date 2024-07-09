@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SferumNet.Configs;
+using SferumNet.Database;
 using SferumNet.DbModels.Enum;
 using SferumNet.Scenarios.Common;
 using SferumNet.Services;

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SferumNet.Database;
 using SferumNet.DbModels.Common;
 using SferumNet.DbModels.Scenarios;
 using SferumNet.DbModels.Vk;
