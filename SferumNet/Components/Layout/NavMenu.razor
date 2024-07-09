@@ -1,12 +1,12 @@
 ﻿@using Microsoft.EntityFrameworkCore
-@using SferumNet.Components.Pages.Components
+@using SferumNet.Components.Pages.Components.Vk
 @using SferumNet.DbModels.Vk
 @using SferumNet.Services.Common
 
 @inject NavigationManager Navigation;
 
 <MudNavMenu>
-    <MudNavLink Href="/home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ElectricalServices">Служба запущена: @_scSerivce.DateTimeStarted</MudNavLink>
+    <MudNavLink Href="/home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ElectricalServices">Служба запущена: @ScSerivce.DateTimeStarted</MudNavLink>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudNavLink OnClick="() => OpenAddProfile()" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Новый профиль</MudNavLink>
     @if (Profiles != null)
@@ -24,7 +24,7 @@
 
 @inject SferumNetContext Ef;
 @inject IDialogService DialogService
-@inject IScenarioConfigurator _scSerivce;
+@inject IScenarioConfigurator ScSerivce;
 
 @code {
 

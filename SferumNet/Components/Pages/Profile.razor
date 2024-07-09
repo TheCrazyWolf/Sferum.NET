@@ -1,7 +1,7 @@
 ﻿@page "/profile"
 @using Microsoft.EntityFrameworkCore
-@using SferumNet.Components.Modal
-@using SferumNet.Components.Pages.Components
+@using SferumNet.Components.Pages.Components.App
+@using SferumNet.Components.Pages.Components.Vk
 @using SferumNet.Components.Pages.ModalsSc
 @using SferumNet.Configs
 @using SferumNet.DbModels.Common
@@ -25,7 +25,7 @@
     <MudToolBar>
         <MudIconButton OnClick="OpenModalCreateSc" Icon="@Icons.Material.Outlined.Add"/>
         <MudIconButton OnClick="() => OpenModalEditProfile()" Icon="@Icons.Material.Outlined.Edit"/>
-        <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit"/>
+        <MudIconButton OnClick="() => OpenModalDeleteProfile()" Icon="@Icons.Material.Outlined.PersonRemoveAlt1" Color="Color.Inherit"/>
     </MudToolBar>
 </MudPaper>
 
@@ -211,6 +211,32 @@ else
             return;
 
         Ef.Remove(scDb);
+        await Ef.SaveChangesAsync();
+    }
+
+    private async Task OpenModalDeleteProfile()
+    {
+        var dialog = await DialogService.ShowAsync<ModalConfirmDialog>();
+        var valueResult = await dialog.Result;
+
+        if (valueResult.Data is null)
+            return;
+
+        if ((bool)valueResult.Data)
+            await ProccessToDeleteProfileAsync(Id);
+
+        Navigation.NavigateTo("/", true);
+    }
+    
+    private async Task ProccessToDeleteProfileAsync(long idProfile)
+    {
+        var vkProfile = await Ef.VkProfiles
+            .FirstOrDefaultAsync(x => x.Id == idProfile);
+
+        if (vkProfile is null)
+            return;
+
+        Ef.Remove(vkProfile);
         await Ef.SaveChangesAsync();
     }
 
