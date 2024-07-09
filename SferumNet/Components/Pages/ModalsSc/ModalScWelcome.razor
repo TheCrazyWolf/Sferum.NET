@@ -14,7 +14,7 @@
         </MudStack>
         <MudStack Row="true">
             <MudTextField @bind-Value="Sc.IdConversation" ReadOnly="true" Label="ID беседы" Variant="Variant.Outlined"></MudTextField>
-            <MudButton OnClick="OpenChooseConversation" Color="Color.Primary" Variant="Variant.Outlined">Выбрать</MudButton>
+            <MudButton Class="mt-2" OnClick="OpenChooseConversation" Color="Color.Primary" Variant="Variant.Outlined">Выбрать</MudButton>
         </MudStack>
         <MudAlert Class="mt-4" Variant="Variant.Outlined" Severity="Severity.Warning">Соблюдайте разумный интервал как для частоты запросов в день и между ними. Частые запросы могут привести к блокировке аккаунтаы</MudAlert>
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" NoIcon="true" Class="my-2">
