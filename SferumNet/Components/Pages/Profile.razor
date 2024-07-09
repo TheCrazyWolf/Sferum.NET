@@ -53,7 +53,7 @@
                         @foreach (var log in GetLogsAsync(scenario.Id).GetAwaiter().GetResult())
                         {
                             string buildStrLabel = $"{log.DateTime} {log.Type}";
-                            <MudTextField T="string" ReadOnly="true" FullWidth="true" Label="@buildStrLabel" Variant="Variant.Filled" Text="@log.Message" Lines="1" Adornment="Adornment.End"/>
+                            <MudTextField T="string" ReadOnly="true" Label="@buildStrLabel" Variant="Variant.Filled" Text="@log.Message" Lines="1" Adornment="Adornment.End"/>
                         }
                     </MudTabPanel>
                 </MudTabs>
