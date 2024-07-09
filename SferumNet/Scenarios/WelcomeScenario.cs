@@ -87,7 +87,7 @@ public class WelcomeScenario : BaseScenario
             .Skip(randomIndex)
             .FirstOrDefaultAsync();
 
-        return thisSentence is null ? "База данных предложений не заполнена" : thisSentence.Message;
+        return thisSentence is null ? $"База данных предложений не заполнена {new Random().Next()}" : thisSentence.Message;
     }
 
     public WelcomeScenario(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
