@@ -51,19 +51,19 @@ public class ScenarioConfigurator : IScenarioConfigurator
                             new WelcomesJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
                                     scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
                                 .ExecuteAsync(_cancelTokenSource.Token));
-                        break;
+                        continue;
                     case FactJob:
                         await Task.Run(() =>
                             new FactsJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
                                     scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
                                 .ExecuteAsync(_cancelTokenSource.Token));
-                        break;
+                        continue;
                     case ScheduleJob:
                         await Task.Run(() =>
                             new SchedulesJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
                                     scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
                                 .ExecuteAsync(_cancelTokenSource.Token));
-                        break;
+                        continue;
                     
                     // ETC ...
                 }
