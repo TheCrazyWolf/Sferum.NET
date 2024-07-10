@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SferumNet", "SferumNet\Sfer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SferumNet.DbModels", "SferumNet.DbModels\SferumNet.DbModels.csproj", "{C6C69BBA-AA87-4AF6-8E9A-9568675C1A36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SferumNet.GitHub.Source", "SferumNet.GitHub.Source\SferumNet.GitHub.Source.csproj", "{CFB15EDC-3680-47A9-9B3E-AD1BAE3ACACF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{C6C69BBA-AA87-4AF6-8E9A-9568675C1A36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6C69BBA-AA87-4AF6-8E9A-9568675C1A36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6C69BBA-AA87-4AF6-8E9A-9568675C1A36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFB15EDC-3680-47A9-9B3E-AD1BAE3ACACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFB15EDC-3680-47A9-9B3E-AD1BAE3ACACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFB15EDC-3680-47A9-9B3E-AD1BAE3ACACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFB15EDC-3680-47A9-9B3E-AD1BAE3ACACF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
