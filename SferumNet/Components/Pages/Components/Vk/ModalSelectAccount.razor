@@ -35,8 +35,8 @@
     [Parameter] public VkProfile Profile { get; set; } = new();
 
     [Parameter] public ICollection<ResponceProfileWebToken>? Accounts { get; set; }
-    
-    private ResponceProfileWebToken _selectedAccount;
+
+    private ResponceProfileWebToken _selectedAccount = new();
 
     void Submit() => MudDialog.Close(_selectedAccount);
     void Cancel() => MudDialog.Cancel();

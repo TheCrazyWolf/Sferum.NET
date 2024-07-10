@@ -5,7 +5,7 @@ using SferumNet.Services;
 
 namespace SferumNet.Scenarios;
 
-public class FactsJob : WelcomeJob
+public class FactsJob : WelcomesJob
 {
     public FactsJob(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
     {

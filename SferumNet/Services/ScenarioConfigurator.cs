@@ -5,7 +5,7 @@ using SferumNet.DbModels.Scenarios;
 using SferumNet.DbModels.Vk;
 using SferumNet.Scenarios;
 using SferumNet.Services.Common;
-using WelcomeJob = SferumNet.Scenarios.WelcomeJob;
+using WelcomeJob = SferumNet.DbModels.Scenarios.WelcomeJob;
 
 namespace SferumNet.Services;
 
@@ -44,26 +44,29 @@ public class ScenarioConfigurator : IScenarioConfigurator
 
             foreach (var scenario in scenarios)
             {
-                if (scenario is WelcomeJob)
-                    await Task.Run(() =>
-                        new WelcomeJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
-                                scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
-                            .ExecuteAsync(_cancelTokenSource.Token));
-                
-                if (scenario is FactJob)
-                    await Task.Run(() =>
-                        new FactsJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
-                                scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
-                            .ExecuteAsync(_cancelTokenSource.Token));
-                
-                if (scenario is ScheduleJob)
-                    await Task.Run(() =>
-                        new SchedulesJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
-                                scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
-                            .ExecuteAsync(_cancelTokenSource.Token));
-                
-                
-                // ETC ...
+                switch (scenario)
+                {
+                    case WelcomeJob:
+                        await Task.Run(() =>
+                            new WelcomesJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
+                                    scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
+                                .ExecuteAsync(_cancelTokenSource.Token));
+                        break;
+                    case FactJob:
+                        await Task.Run(() =>
+                            new FactsJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
+                                    scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
+                                .ExecuteAsync(_cancelTokenSource.Token));
+                        break;
+                    case ScheduleJob:
+                        await Task.Run(() =>
+                            new SchedulesJob(scope.ServiceProvider.GetRequiredService<SferumNetContext>(),
+                                    scope.ServiceProvider.GetRequiredService<DbLogger>(), scenario.Id)
+                                .ExecuteAsync(_cancelTokenSource.Token));
+                        break;
+                    
+                    // ETC ...
+                }
             }
         }
     }

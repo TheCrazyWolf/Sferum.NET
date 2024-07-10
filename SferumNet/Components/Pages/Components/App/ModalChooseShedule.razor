@@ -60,12 +60,12 @@
         set
         {
             _selectedTypeSchedule = value;
-            LoadValuesAsync(value);
+            _ = LoadValuesAsync(value);
         }
     }
     
     private List<object> _values = new();
-    private object _selectedValue;
+    private object? _selectedValue = new ();
 
     private void Cancel() => MudDialog.Cancel();
 
@@ -79,18 +79,18 @@
     private async Task LoadValuesAsync(SheduleSearchType selected)
     {
         if (selected is SheduleSearchType.Cab)
-            _values = new List<object>(await _samgk.Cabs.GetCabsAsync());
+            _values = new List<object>((await _samgk.Cabs.GetCabsAsync())!);
         
         if (selected is SheduleSearchType.Group)
-            _values = new List<object>(await _samgk.Groups.GetGroupsAsync());
+            _values = new List<object>((await _samgk.Groups.GetGroupsAsync())!);
         
         if (selected is SheduleSearchType.Employee)
-            _values = new List<object>(await _samgk.Accounts.GetEmployeesAsync());
+            _values = new List<object>((await _samgk.Accounts.GetEmployeesAsync())!);
     }
 
     private void Select()
     {
-        MudDialog.Close(new ScheduleResult { Type = _selectedTypeSchedule, Value = _selectedValue.ToString()});
+        MudDialog.Close(new ScheduleResult { Type = _selectedTypeSchedule, Value = _selectedValue!.ToString()!});
     }
 
 }

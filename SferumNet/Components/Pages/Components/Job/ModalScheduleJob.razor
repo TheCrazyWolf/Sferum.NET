@@ -108,8 +108,8 @@
         if(result.Data is null)
             return;
 
-        Sc.TypeSchedule = (result.Data as ScheduleResult).Type;
-        Sc.Value = (result.Data as ScheduleResult).Value;
+        Sc.TypeSchedule = (result.Data as ScheduleResult)!.Type;
+        Sc.Value = ((result.Data as ScheduleResult)!).Value!;
     }
 
 }

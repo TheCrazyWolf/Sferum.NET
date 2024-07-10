@@ -9,7 +9,7 @@ using VkNet.Utils;
 
 namespace SferumNet.Scenarios;
 
-public class WelcomeJob : BaseJob
+public class WelcomesJob : BaseJob
 {
     public override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -91,7 +91,7 @@ public class WelcomeJob : BaseJob
         return thisSentence is null ? $"База данных предложений не заполнена {new Random().Next()}" : thisSentence.Message;
     }
 
-    public WelcomeJob(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
+    public WelcomesJob(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
     {
     }
 }

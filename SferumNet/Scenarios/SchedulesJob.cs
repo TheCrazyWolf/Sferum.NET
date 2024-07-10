@@ -8,7 +8,7 @@ using VkNet.Model;
 
 namespace SferumNet.Scenarios;
 
-public class SchedulesJob : WelcomeJob
+public class SchedulesJob : WelcomesJob
 {
     private readonly ClientSamgk _samgk = new();
 
@@ -18,7 +18,8 @@ public class SchedulesJob : WelcomeJob
 
     protected override async Task<string> GetSentencesAsync()
     {
-        var upCasted = CurrentJob as ScheduleJob;
+        if (CurrentJob is not ScheduleJob upCasted)
+            return $"Не удалось получить расписание. {new Random().Next()}";
 
         if (upCasted.IsAddedNextDay)
             return await BuilerStringShedule(await _samgk.Sсhedule
@@ -29,10 +30,10 @@ public class SchedulesJob : WelcomeJob
             .GetScheduleAsync(DateOnly.FromDateTime(DateTime.Now), upCasted.TypeSchedule, upCasted.Value));
     }
 
-    private async Task<string> BuilerStringShedule(IEnumerable<IScheduleDate>? schedule)
+    private Task<string> BuilerStringShedule(IEnumerable<IScheduleDate>? schedule)
     {
         if (schedule is null || schedule.Count() is 0)
-            return $"Не удалось получить расписание. {new Random().Next()}";
+            return Task.FromResult($"Не удалось получить расписание. {new Random().Next()}");
 
         var msg = new StringBuilder();
 
@@ -45,6 +46,6 @@ public class SchedulesJob : WelcomeJob
             }
         }
 
-        return msg.ToString();
+        return Task.FromResult(msg.ToString());
     }
 }
