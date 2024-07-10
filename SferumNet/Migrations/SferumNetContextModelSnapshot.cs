@@ -73,7 +73,7 @@ namespace SferumNet.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("SferumNet.DbModels.Data.WelcomeSentence", b =>
+            modelBuilder.Entity("SferumNet.DbModels.Data.Common.BaseMessage", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,9 +90,9 @@ namespace SferumNet.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WelcomeSentences");
+                    b.ToTable("MessagesSentences");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("WelcomeSentence");
+                    b.HasDiscriminator<string>("Discriminator").HasValue("BaseMessage");
 
                     b.UseTphMappingStrategy();
                 });
@@ -188,9 +188,16 @@ namespace SferumNet.Migrations
 
             modelBuilder.Entity("SferumNet.DbModels.Data.FactSentences", b =>
                 {
-                    b.HasBaseType("SferumNet.DbModels.Data.WelcomeSentence");
+                    b.HasBaseType("SferumNet.DbModels.Data.Common.BaseMessage");
 
                     b.HasDiscriminator().HasValue("FactSentences");
+                });
+
+            modelBuilder.Entity("SferumNet.DbModels.Data.WelcomeSentence", b =>
+                {
+                    b.HasBaseType("SferumNet.DbModels.Data.Common.BaseMessage");
+
+                    b.HasDiscriminator().HasValue("WelcomeSentence");
                 });
 
             modelBuilder.Entity("SferumNet.DbModels.Common.Job", b =>

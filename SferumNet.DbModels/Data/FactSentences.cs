@@ -1,3 +1,5 @@
+using SferumNet.DbModels.Data.Common;
+
 namespace SferumNet.DbModels.Data;
 
-public class FactSentences : WelcomeSentence;
+public class FactSentences : BaseMessage;
