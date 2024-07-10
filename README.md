@@ -9,3 +9,8 @@
 Небольшой дата сет для отправки сообщений Welcome, Facts в xlsx листе в папке Dataset, необходимо добавить в LocalStorage.db
 
 Инструкция по работе внутри, в домашней странице 
+
+# Скриншоты
+![Alt text](/SferumNet.GitHub.Source/ReadMe/Screen1.png?raw=true "Optional Title")
+![Alt text](/SferumNet.GitHub.Source/ReadMe/Screen2.png?raw=true "Optional Title")
+![Alt text](/SferumNet.GitHub.Source/ReadMe/Screen3.png?raw=true "Optional Title")
