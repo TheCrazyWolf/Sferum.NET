@@ -16,6 +16,9 @@ builder.Services.AddTransient<SferumNetContext>();
 builder.Services.AddScoped<DbLogger>();
 builder.Services.AddSingleton<IScenarioConfigurator, ScenarioConfigurator>();
 
+builder.WebHost.ConfigureKestrel(
+    options => options.ListenAnyIP(85));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
