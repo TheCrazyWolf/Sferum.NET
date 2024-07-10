@@ -12,6 +12,20 @@ namespace SferumNet.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "MessagesSentences",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 21, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessagesSentences", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VkProfiles",
                 columns: table => new
                 {
@@ -26,20 +40,6 @@ namespace SferumNet.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_VkProfiles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WelcomeSentences",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 21, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WelcomeSentences", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -115,7 +115,7 @@ namespace SferumNet.Migrations
                 name: "Logs");
 
             migrationBuilder.DropTable(
-                name: "WelcomeSentences");
+                name: "MessagesSentences");
 
             migrationBuilder.DropTable(
                 name: "Scenarios");
