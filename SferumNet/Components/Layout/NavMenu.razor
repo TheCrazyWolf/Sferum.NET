@@ -6,7 +6,7 @@
 
 @inject NavigationManager Navigation;
 
-<MudNavMenu>
+<MudNavMenu >
     <MudNavLink Href="/home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ElectricalServices">Служба запущена: @ScSerivce.DateTimeStarted</MudNavLink>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudNavLink OnClick="() => OpenAddProfile()" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Новый профиль</MudNavLink>
