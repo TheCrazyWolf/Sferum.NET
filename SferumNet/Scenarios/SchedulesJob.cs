@@ -12,7 +12,7 @@ public class SchedulesJob : WelcomesJob
 {
     private readonly ClientSamgk _samgk = new();
 
-    public SchedulesJob(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
+    public SchedulesJob(IServiceScopeFactory scopeFactory, long idScenario) : base(scopeFactory, idScenario)
     {
     }
 

@@ -26,7 +26,7 @@ public class WelcomesJob : BaseJob
                 continue;
             
             await ProcessAsync();
-            await Task.Delay(CurrentJob?.Delay ?? ScConst.DelayDefault, cancellationToken);
+            await Task.Delay(CurrentJob?.Delay ?? ScConst.DelayDefault);
         }
         
         await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий завершен");
@@ -92,7 +92,7 @@ public class WelcomesJob : BaseJob
         return thisSentence is null ? $"База данных предложений не заполнена {new Random().Next()}" : thisSentence.Message;
     }
 
-    public WelcomesJob(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
+    public WelcomesJob(IServiceScopeFactory scopeFactory, long idScenario) : base(scopeFactory, idScenario)
     {
     }
 }

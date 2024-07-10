@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SferumNet.Database;
-using SferumNet.DbModels.Data;
 using SferumNet.DbModels.Scenarios;
 using SferumNet.Services;
 
@@ -8,7 +7,7 @@ namespace SferumNet.Scenarios;
 
 public class FactsJob : WelcomesJob
 {
-    public FactsJob(SferumNetContext ef, DbLogger dbLogger, long idScenario) : base(ef, dbLogger, idScenario)
+    public FactsJob(IServiceScopeFactory scopeFactory, long idScenario) : base(scopeFactory, idScenario)
     {
     }
 

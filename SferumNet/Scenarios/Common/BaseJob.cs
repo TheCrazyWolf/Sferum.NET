@@ -10,12 +10,13 @@ using VkNet.Model;
 
 namespace SferumNet.Scenarios.Common;
 
-public class BaseJob : IJob
+public class BaseJob : IJob, IDisposable
 {
     protected readonly long IdScenario;
     protected CancellationToken CancellationToken;
 
     /* Services */
+    private IServiceScope _scope;
     protected readonly DbLogger Logger;
     private readonly VkRemixFactory _vkRemixFactory;
 
@@ -25,10 +26,11 @@ public class BaseJob : IJob
     protected VkProfile? CurrentProfileDb;
     protected Job? CurrentJob;
 
-    public BaseJob(SferumNetContext ef, DbLogger dbLogger, long idScenario)
+    public BaseJob(IServiceScopeFactory scopeFactory, long idScenario)
     {
-        Ef = ef;
-        Logger = dbLogger;
+        _scope = scopeFactory.CreateScope();
+        Ef = _scope.ServiceProvider.GetRequiredService<SferumNetContext>();
+        Logger = _scope.ServiceProvider.GetRequiredService<DbLogger>();
         IdScenario = idScenario;
 
         VkApi = new VkApi();
@@ -140,5 +142,12 @@ public class BaseJob : IJob
         {
             AccessToken = CurrentProfileDb.AccessToken
         }, CancellationToken);
+    }
+
+    public void Dispose()
+    {
+        Ef.Dispose();
+        VkApi.Dispose();
+        _scope.Dispose();
     }
 }
