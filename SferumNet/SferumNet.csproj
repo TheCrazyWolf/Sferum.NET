@@ -34,4 +34,12 @@
       <Folder Include="Migrations\" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <None Include="wwwroot\Source\AuthRemix\SF1.png" />
+      <None Include="wwwroot\Source\AuthRemix\SF2.png" />
+      <None Include="wwwroot\Source\AuthRemix\SF3.png" />
+      <None Include="wwwroot\Source\AuthRemix\SF4.png" />
+    </ItemGroup>
+
 </Project>

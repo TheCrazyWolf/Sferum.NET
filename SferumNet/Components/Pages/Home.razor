@@ -1,59 +1,76 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>SferumNet</PageTitle>
 
+<MudText Typo="Typo.h3" GutterBottom="true">СферумНет</MudText>
+<MudText Class="mb-8">Проект автоматизирующий отправку сообщений (для набивки статистики в образовательных организациях)</MudText>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor and the .NET 8 Template!</MudText>
-
+<MudText Typo="Typo.h5" GutterBottom="true">Добавление собственных сценариев</MudText>
 <MudAlert Severity="Severity.Normal">
-    You can find documentation and examples on our website here:
-    <MudLink Href="https://mudblazor.com" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        <b>www.mudblazor.com</b>
-    </MudLink>
+    Этот раздел для айтышников
 </MudAlert>
-
-<br/>
-<MudText Typo="Typo.h5" GutterBottom="true">Interactivity in this Template</MudText>
-<br/>
 <MudText Typo="Typo.body2">
-    When you opt for the "Global" Interactivity Location, <br/>
-    the render modes are defined in App.razor and consequently apply to all child components.<br/>
-    In this case, providers are globally set in the MainLayout.<br/>
+    Склонируйте репозиторий и создайте в папке проекта свой сценарий.<br/>
+    Реализация собственного сценария путем испозования интерфейса IJob
+    позволит с нуля написать без использования мои костыльных методов.
+    <code>
+        <pre>
+public interface IJob
+{
+    Task ExecuteAsync(CancellationToken cancellationToken);
+    bool CanBeExecuted();
+    Task ProcessAsync();
+}
+        </pre>
+    </code>
+    Или вы можете унаследоваться от BaseJob с переопредлением метода ExecuteAsync()<br/>
     <br/>
-    On the other hand, if you choose the "Per page/component" Interactivity Location,<br/>
-    it is necessary to include the <br/>
-    <br/>
-    &lt;MudPopoverProvider /&gt; <br/>
-    &lt;MudDialogProvider /&gt; <br/>
-    &lt;MudSnackbarProvider /&gt; <br/>
-    <br/>
-    components on every interactive page.<br/>
-    <br/>
-    If a render mode is not specified for a page, it defaults to Server-Side Rendering (SSR),<br/>
-    similar to this page. While MudBlazor allows pages to be rendered in SSR,<br/>
-    please note that interactive features, such as buttons and dropdown menus, will not be functional.
+    Далее: Добавьте модальные окна для создания сценариев, в перечисление EnumJob и в запуске сценариев ScenarioConfigurator 
+    <br/>и везде где только можно, прочитав немного кода
 </MudText>
 
 <br/>
-<MudText Typo="Typo.h5" GutterBottom="true">What's New in Blazor with the Release of .NET 8</MudText>
-<br/>
-<MudText Typo="Typo.h6" GutterBottom="true">Prerendering</MudText>
-<MudText Typo="Typo.body2" GutterBottom="true">
-    If you're exploring the features of .NET 8 Blazor,<br/> you might be pleasantly surprised to learn that each page is prerendered on the server,<br/> regardless of the selected render mode.<br/><br/>
-    This means that you'll need to inject all necessary services on the server,<br/> even when opting for the wasm (WebAssembly) render mode.<br/><br/>
-    This prerendering functionality is crucial to ensuring that WebAssembly mode feels fast and responsive,<br/> especially when it comes to initial page load times.<br/><br/>
-    For more information on how to detect prerendering and leverage the RenderContext, you can refer to the following link:
-    <MudLink Href="https://github.com/dotnet/aspnetcore/issues/51468#issuecomment-1783568121" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        More details
+<MudText Typo="Typo.h5" GutterBottom="true">Авторизация</MudText>
+<MudText Typo="Typo.body2">
+    Шаг 1. Перейдите на сайт <MudLink Href="https://web.vk.me/" Target="_blank" 
+                                      Typo="Typo.body2" Color="Color.Primary">VK Messenger
     </MudLink>
+    и пройдите авторизацию с галочкой "Сохранить вход"
+    <br/>
 </MudText>
 
-<br/>
-<MudText Typo="Typo.h6" GutterBottom="true">InteractiveAuto</MudText>
 <MudText Typo="Typo.body2">
-    A discussion on how to achieve this can be found here:
-    <MudLink Href="https://github.com/dotnet/aspnetcore/issues/51468#issue-1950424116" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        More details
-    </MudLink>
+    Шаг 2. После авторизации по пустому месту кликните правой кнопкой мышки и выберите "Просмотреть код"
+</MudText>
+<MudImage Src="/Source/AuthRemix/SF1.png" Height="350"></MudImage>
+
+<MudText Typo="Typo.body2">
+    Шаг 3. Перейдите в раздел Приложение (Application), далее выберите Куки (Cookies) и далее выберите подраздел web.vk.me
+</MudText>
+<MudImage Src="/Source/AuthRemix/SF2.png" Height="350"></MudImage>
+
+<MudText Typo="Typo.body2">
+    Шаг 4. В поиске наберите Remixdsid и найдите этот кук. Кликните на него
+</MudText>
+<MudImage Src="/Source/AuthRemix/SF3.png" Height="350"></MudImage>\
+
+<MudText Typo="Typo.body2">
+    Шаг 5. Скопируйте это значение и перенесите его в поле где оно потребуется
+</MudText>
+<MudImage Src="/Source/AuthRemix/SF4.png" Height="350"></MudImage>
+
+<br/>
+<MudText Typo="Typo.h6" GutterBottom="true">Вход и пример создания сценария</MudText>
+<MudText Typo="Typo.body2">
+    <MudText Typo="Typo.body2">
+        Шаг 1. Кликните в меню "Новый профиль", Вставьте REMIXDSID и предыдущей инструкции и нажите сохранить
+    </MudText>
+
+    <MudText Typo="Typo.body2">
+        Шаг 2. В случае успешного входа, на экране будут перечислены все профили. Последний - сферум.
+    </MudText>
+
+    <MudText Typo="Typo.body2">
+        Шаг 3. Нажмите + и выберите сценарий, далее все понятно)
+    </MudText>
 </MudText>
