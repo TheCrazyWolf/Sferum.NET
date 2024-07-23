@@ -14,7 +14,7 @@ namespace SferumNet.Services;
 public class ScenarioConfigurator : IScenarioConfigurator
 {
     public DateTime? DateTimeStarted { get; set; }
-    private bool _isAlive;
+    private CancellationTokenSource _cancelTokenSource = new();
     private readonly IServiceScopeFactory _scopeFactory;
 
     private List<Thread> _threads = new();
@@ -28,7 +28,7 @@ public class ScenarioConfigurator : IScenarioConfigurator
 
     public async Task RunAsync()
     {
-        _isAlive = true;
+        _cancelTokenSource = new();
         using var scope = _scopeFactory.CreateScope();
         var ef = scope.ServiceProvider.GetRequiredService<SferumNetContext>();
 
@@ -50,9 +50,9 @@ public class ScenarioConfigurator : IScenarioConfigurator
             {
                 var thread = scenario switch
                 {
-                    FactJob => new Thread(async () => await JobFactory<FactsJob>(scenario.Id).ExecuteAsync(_isAlive)),
-                    ScheduleJob => new Thread(async () => await JobFactory<SchedulesJob>(scenario.Id).ExecuteAsync(_isAlive)),
-                    WelcomeJob => new Thread(async () => await JobFactory<WelcomesJob>(scenario.Id).ExecuteAsync(_isAlive)),
+                    FactJob => new Thread(async () => await JobFactory<FactsJob>(scenario.Id).ExecuteAsync(_cancelTokenSource.Token)),
+                    ScheduleJob => new Thread(async () => await JobFactory<SchedulesJob>(scenario.Id).ExecuteAsync(_cancelTokenSource.Token)),
+                    WelcomeJob => new Thread(async () => await JobFactory<WelcomesJob>(scenario.Id).ExecuteAsync(_cancelTokenSource.Token)),
                     _ => throw new ArgumentOutOfRangeException(nameof(scenario))
                 };
                 thread.Name = $"{scenario.Id}";
@@ -69,17 +69,18 @@ public class ScenarioConfigurator : IScenarioConfigurator
         return (T)Activator.CreateInstance(typeof(T), _scopeFactory, scenarioId)!;
     }
 
-    public Task StopAsync()
+    public async Task StopAsync()
     {
         DateTimeStarted = null;
-        _isAlive = false;
-        foreach (var thread in _threads.Where(thread => thread.IsAlive))
+
+        await _cancelTokenSource.CancelAsync();
+        foreach (var thread in _threads)
         {
-            thread.Join(); // ожидание завершения потоков
+            thread.Interrupt();
         }
+
         _threads = new();
-        
-        return Task.CompletedTask;
+        _cancelTokenSource.Dispose();
     }
 
     public async Task RestartAsync()
@@ -91,7 +92,7 @@ public class ScenarioConfigurator : IScenarioConfigurator
     private async Task<ICollection<VkProfile>?> GetProfilesAsync(SferumNetContext ef)
     {
         return await ef.VkProfiles
-            .ToListAsync();
+            .ToListAsync(cancellationToken: _cancelTokenSource.Token);
     }
 
     private async Task<ICollection<Job>?> GetJobsByProfileAsync(SferumNetContext ef, long idProfile)
@@ -99,6 +100,6 @@ public class ScenarioConfigurator : IScenarioConfigurator
         return await ef.Scenarios
             .Where(sc => sc.IdProfile == idProfile)
             .Where(sc => sc.IsActive)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: _cancelTokenSource.Token);
     }
 }
