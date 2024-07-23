@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SferumNet.Configs;
-using SferumNet.Database;
-using SferumNet.DbModels.Data;
 using SferumNet.DbModels.Enum;
 using SferumNet.Scenarios.Common;
-using SferumNet.Services;
 using VkNet.Exception;
 using VkNet.Utils;
 
@@ -12,23 +9,31 @@ namespace SferumNet.Scenarios;
 
 public class WelcomesJob : BaseJob
 {
-    public override async Task ExecuteAsync(CancellationToken cancellationToken)
+    public WelcomesJob(IServiceScopeFactory scopeFactory, long idScenario) : base(scopeFactory, idScenario)
     {
-        await base.ExecuteAsync(cancellationToken);
-        
-        while (!CancellationToken.IsCancellationRequested)
+    }
+    
+    public override async Task ExecuteAsync(bool run = true)
+    {
+        await base.ExecuteAsync(run);
+
+        while (IsRun)
         {
             await UpdateProfileAndScAsync();
-            
+
             await ResetCounterExecutedIfNextDayAsync();
-            
-            if(!CanBeExecuted())
+
+            if (!CanBeExecuted())
+            {
+                // Фикс нагрузки на процессор в простое
+                Thread.Sleep(5000);
                 continue;
-            
+            }
+
             await ProcessAsync();
             await Task.Delay(CurrentJob?.Delay ?? ScConst.DelayDefault);
         }
-        
+
         await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий завершен");
     }
 
@@ -36,7 +41,7 @@ public class WelcomesJob : BaseJob
     {
         if (CurrentJob is null || CurrentProfileDb is null)
             return false;
-        
+
         if (!(DateTime.Now.TimeOfDay >= CurrentJob.TimeStart && DateTime.Now.TimeOfDay <= CurrentJob.TimeEnd))
             return false;
 
@@ -45,7 +50,7 @@ public class WelcomesJob : BaseJob
 
         if (DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
             return CurrentJob.IsActiveForWeekend;
-        
+
         return CurrentJob.IsActive;
     }
 
@@ -53,7 +58,7 @@ public class WelcomesJob : BaseJob
     {
         if (CurrentJob is null || CurrentProfileDb is null)
             return;
-        
+
         try
         {
             var parameters = new VkParameters
@@ -68,13 +73,12 @@ public class WelcomesJob : BaseJob
         }
         catch (Exception e)
         {
-            
-            if(e is UserAuthorizationFailException)
+            if (e is UserAuthorizationFailException)
             {
                 await RefreshIfTokenExpireAsync();
                 return;
             }
-            
+
             await Logger.LogAsync(IdScenario, EventType.Error, $"Ошибка при выполнении скрипта\n{e.Message}");
         }
     }
@@ -83,16 +87,15 @@ public class WelcomesJob : BaseJob
     {
         var countTotal = await Ef.WelcomeSentences.CountAsync();
         var randomIndex = new Random().Next(countTotal);
-            
+
         var thisSentence = await Ef.WelcomeSentences
-            .OrderBy(w => w.Id) 
+            .OrderBy(w => w.Id)
             .Skip(randomIndex)
             .FirstOrDefaultAsync();
 
-        return thisSentence is null ? $"База данных предложений не заполнена {new Random().Next()}" : thisSentence.Message;
+        return thisSentence is null
+            ? $"База данных предложений не заполнена {new Random().Next()}"
+            : thisSentence.Message;
     }
-
-    public WelcomesJob(IServiceScopeFactory scopeFactory, long idScenario) : base(scopeFactory, idScenario)
-    {
-    }
+    
 }

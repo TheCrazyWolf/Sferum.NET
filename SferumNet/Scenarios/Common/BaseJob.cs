@@ -13,7 +13,7 @@ namespace SferumNet.Scenarios.Common;
 public class BaseJob : IJob, IDisposable
 {
     protected readonly long IdScenario;
-    protected CancellationToken CancellationToken;
+    protected bool IsRun;
 
     /* Services */
     private IServiceScope _scope;
@@ -37,10 +37,12 @@ public class BaseJob : IJob, IDisposable
         _vkRemixFactory = new VkRemixFactory();
     }
 
-    public virtual async Task ExecuteAsync(CancellationToken cancellationToken)
+    public virtual async Task ExecuteAsync(bool run = true)
     {
-        CancellationToken = cancellationToken;
-        await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий запущен");
+        IsRun = run;
+        
+        if(IsRun)
+            await Logger.LogAsync(IdScenario, EventType.Info, "Сценарий запущен");
     }
 
     public virtual bool CanBeExecuted()
@@ -56,13 +58,13 @@ public class BaseJob : IJob, IDisposable
     private async Task<VkProfile?> GetProfileAsync(long? idProfile)
     {
         return await Ef.VkProfiles
-            .FirstOrDefaultAsync(x => x.Id == idProfile, cancellationToken: CancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == idProfile);
     }
 
     private async Task<Job?> GetScenarioAsync(long idSc)
     {
         return await Ef.Scenarios
-            .FirstOrDefaultAsync(x => x.Id == idSc, cancellationToken: CancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == idSc);
     }
 
     protected async Task UpdateProfileAndScAsync()
@@ -97,7 +99,7 @@ public class BaseJob : IJob, IDisposable
         CurrentProfileDb.AccessToken = webTokenAccount.AccessToken;
         CurrentProfileDb.AccessTokenExpired = DateTime.Now.AddMinutes(10).Ticks;
         Ef.Update(CurrentProfileDb);
-        await Ef.SaveChangesAsync(CancellationToken);
+        await Ef.SaveChangesAsync();
             
         await ConfigureVkApiAsync();
     }
@@ -113,7 +115,7 @@ public class BaseJob : IJob, IDisposable
             CurrentJob.TotalExecuted = 0;
             CurrentJob.LastExecuted = DateTime.Now;
             Ef.Update(CurrentJob);
-            await Ef.SaveChangesAsync(CancellationToken);
+            await Ef.SaveChangesAsync();
         }
     }
 
@@ -126,7 +128,7 @@ public class BaseJob : IJob, IDisposable
         CurrentJob.TotalExecuted++;
         CurrentJob.LastExecuted = DateTime.Now;
         Ef.Update(CurrentJob);
-        await Ef.SaveChangesAsync(CancellationToken);
+        await Ef.SaveChangesAsync();
 
         await Logger.LogAsync(IdScenario, EventType.Success, $"Сценарий успешно выполнен");
     }
@@ -141,7 +143,7 @@ public class BaseJob : IJob, IDisposable
         await VkApi.AuthorizeAsync(new ApiAuthParams
         {
             AccessToken = CurrentProfileDb.AccessToken
-        }, CancellationToken);
+        });
     }
 
     public void Dispose()
@@ -149,5 +151,11 @@ public class BaseJob : IJob, IDisposable
         Ef.Dispose();
         VkApi.Dispose();
         _scope.Dispose();
+    }
+
+    public void Stop()
+    {
+        IsRun = false;
+        Dispose();
     }
 }

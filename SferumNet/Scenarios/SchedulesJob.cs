@@ -1,10 +1,7 @@
 using System.Text;
 using SamGK_Api;
 using SamGK_Api.Interfaces.Schedule;
-using SferumNet.Database;
 using SferumNet.DbModels.Scenarios;
-using SferumNet.Services;
-using VkNet.Model;
 
 namespace SferumNet.Scenarios;
 
