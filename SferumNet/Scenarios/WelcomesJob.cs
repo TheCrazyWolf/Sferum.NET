@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SferumNet.Configs;
-using SferumNet.Database;
-using SferumNet.DbModels.Data;
 using SferumNet.DbModels.Enum;
 using SferumNet.Scenarios.Common;
-using SferumNet.Services;
 using VkNet.Exception;
 using VkNet.Utils;
 
@@ -12,11 +9,11 @@ namespace SferumNet.Scenarios;
 
 public class WelcomesJob : BaseJob
 {
-    public override async Task ExecuteAsync(CancellationToken cancellationToken)
+    public override async Task ExecuteAsync(bool isAlive)
     {
-        await base.ExecuteAsync(cancellationToken);
+        await base.ExecuteAsync(isAlive);
         
-        while (!CancellationToken.IsCancellationRequested)
+        while (!base.IsAlive)
         {
             await UpdateProfileAndScAsync();
             
@@ -62,7 +59,7 @@ public class WelcomesJob : BaseJob
                 { "random_id", new Random().Next() },
                 { "message", await GetSentencesAsync() }
             };
-
+            
             VkApi.Call("messages.send", parameters);
             await ProccessIncrementExecutedAsync();
         }

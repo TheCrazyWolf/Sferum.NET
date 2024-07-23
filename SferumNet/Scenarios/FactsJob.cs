@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SferumNet.Database;
 using SferumNet.DbModels.Scenarios;
-using SferumNet.Services;
 
 namespace SferumNet.Scenarios;
 
