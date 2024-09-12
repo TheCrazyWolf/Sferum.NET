@@ -7,7 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="SamGK_Api" Version="1.0.0" />
+      <Reference Include="ClientSamgk">
+        <HintPath>..\..\Api-Client-for-samgk.ru\libs\ClientSamgk.dll</HintPath>
+      </Reference>
+      <Reference Include="ClientSamgkApiModelResponse">
+        <HintPath>..\..\Api-Client-for-samgk.ru\libs\ClientSamgkApiModelResponse.dll</HintPath>
+      </Reference>
+      <Reference Include="ClientSamgkOutputResponse">
+        <HintPath>..\..\Api-Client-for-samgk.ru\libs\ClientSamgkOutputResponse.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

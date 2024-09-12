@@ -1,5 +1,4 @@
 ﻿@using Microsoft.EntityFrameworkCore
-@using SamGK_Api.Interfaces.Client
 @using SferumNet.Components.Pages.Components.App
 @using SferumNet.Components.Pages.Components.Job.Common
 @using SferumNet.Components.Pages.Components.Vk
@@ -102,12 +101,11 @@
     
     private async Task OpenChooseValues()
     {
-        var dialog = await DialogService.ShowAsync<ModalChooseShedule>("Выберите значение");
+        var dialog = await DialogService
+            .ShowAsync<ModalChooseShedule>("Выберите значение");
         var result = await dialog.Result;
         
-        if(result.Data is null)
-            return;
-
+        if(result.Data is null) return;
         Sc.TypeSchedule = (result.Data as ScheduleResult)!.Type;
         Sc.Value = ((result.Data as ScheduleResult)!).Value!;
     }

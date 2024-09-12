@@ -1,11 +1,9 @@
-@using SamGK_Api
-@using SamGK_Api.Interfaces.Client
-@using SamGK_Api.Interfaces.Groups
-@using SamGK_Api.Models.Account
-@using SamGK_Api.Models.Cabs
-@using SamGK_Api.Models.Group
+@using ClientSamgk
+@using ClientSamgk.Enums
+@using ClientSamgkOutputResponse.Interfaces.Cabs
+@using ClientSamgkOutputResponse.Interfaces.Groups
+@using ClientSamgkOutputResponse.Interfaces.Identity
 @using SferumNet.Components.Pages.Components.Job.Common
-@using SferumNet.Scenarios.Extensions
 
 @inject IDialogService DialogService
 
@@ -14,9 +12,9 @@
         <MudSelect Label="Тип расписания"
                    @bind-Value="@SheduleType"
                    AnchorOrigin="Origin.BottomCenter">
-            @foreach (var item in Enum.GetValues(typeof(SheduleSearchType)).Cast<SheduleSearchType>())
-            {
-                <MudSelectItem T="SheduleSearchType" Value="item">@item</MudSelectItem>
+            @foreach (var item in Enum.GetValues(typeof(ScheduleSearchType)).Cast<ScheduleSearchType>())
+            { 
+                <MudSelectItem T="ScheduleSearchType" Value="item">@item</MudSelectItem>
             }
         </MudSelect>
 
@@ -25,15 +23,15 @@
                    AnchorOrigin="Origin.BottomCenter">
             @foreach (var item in _values)
             {
-                if (item is Group groupUpcasted)
+                if (item is IResultOutGroup groupUpcasted)
                 {
                     <MudSelectItem T="object" Value="groupUpcasted.Id">@groupUpcasted.Name</MudSelectItem>
                 }
-                else if (item is Cab cabUpcasted)
+                else if (item is IResultOutCab cabUpcasted)
                 {
-                    <MudSelectItem T="object" Value="cabUpcasted.Name">@cabUpcasted.Name</MudSelectItem>
+                    <MudSelectItem T="object" Value="cabUpcasted.Adress">@cabUpcasted.Adress</MudSelectItem>
                 }
-                else if (item is Employee teacherUpcasted)
+                else if (item is IResultOutIdentity teacherUpcasted)
                 {
                     <MudSelectItem T="object" Value="teacherUpcasted.Id">@teacherUpcasted.Name</MudSelectItem>
                 }
@@ -48,13 +46,16 @@
 
 @code {
 
+
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    private readonly ClientSamgk _samgk = new();
 
-    private SheduleSearchType _selectedTypeSchedule = SheduleSearchType.Employee;
+    private ClientSamgkApi _samgk;
+
     
-    public SheduleSearchType SheduleType
+    private ScheduleSearchType _selectedTypeSchedule = ScheduleSearchType.Group;
+
+    public ScheduleSearchType SheduleType
     {
         get => _selectedTypeSchedule;
         set
@@ -64,33 +65,37 @@
         }
     }
     
+
     private List<object> _values = new();
-    private object? _selectedValue = new ();
+    private object? _selectedValue = new();
 
     private void Cancel() => MudDialog.Cancel();
 
 
     protected override Task OnInitializedAsync()
     {
-        SheduleType = SheduleSearchType.Employee;
+        //SheduleType = ScheduleSearchType.Group;
+        _samgk = new ClientSamgkApi();
         return Task.CompletedTask;
     }
 
-    private async Task LoadValuesAsync(SheduleSearchType selected)
+    private async Task LoadValuesAsync(ScheduleSearchType selected)
     {
-        if (selected is SheduleSearchType.Cab)
-            _values = new List<object>((await _samgk.Cabs.GetCabsAsync())!);
-        
-        if (selected is SheduleSearchType.Group)
-            _values = new List<object>((await _samgk.Groups.GetGroupsAsync())!);
-        
-        if (selected is SheduleSearchType.Employee)
-            _values = new List<object>((await _samgk.Accounts.GetEmployeesAsync())!);
+        /*
+        if (selected is ScheduleSearchType.Cab)
+            _values = new List<object>((_samgk.Cabs.GetCabs()));
+
+        if (selected is ScheduleSearchType.Group)
+            _values = new List<object>((_samgk.Groups.GetGroups()));
+            */
+
+        /*if (selected is ScheduleSearchType.Employee)
+            _values = new List<object>((await _samgk.GetEmployeesAsync())!);*/
     }
 
     private void Select()
     {
         MudDialog.Close(new ScheduleResult { Type = _selectedTypeSchedule, Value = _selectedValue!.ToString()!});
     }
-
+    
 }

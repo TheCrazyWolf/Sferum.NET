@@ -1,13 +1,13 @@
 using System.Text;
-using SamGK_Api;
-using SamGK_Api.Interfaces.Schedule;
+using ClientSamgk;
+using ClientSamgkOutputResponse.Interfaces.Schedule;
 using SferumNet.DbModels.Scenarios;
 
 namespace SferumNet.Scenarios;
 
 public class SchedulesJob : WelcomesJob
 {
-    private readonly ClientSamgk _samgk = new();
+    private readonly ClientSamgkApi _samgk = new();
 
     public SchedulesJob(IServiceScopeFactory scopeFactory, long idScenario) : base(scopeFactory, idScenario)
     {
@@ -27,11 +27,11 @@ public class SchedulesJob : WelcomesJob
             .GetScheduleAsync(DateOnly.FromDateTime(DateTime.Now), upCasted.TypeSchedule, upCasted.Value));
     }
 
-    private Task<string> BuilerStringShedule(IEnumerable<IScheduleDate>? schedule)
+    private Task<string> BuilerStringShedule(IEnumerable<IResultOutScheduleFromDate>? schedule)
     {
         if (schedule is null || schedule.Count() is 0)
             return Task.FromResult($"Не удалось получить расписание. {new Random().Next()}");
-
+            
         var msg = new StringBuilder();
 
         foreach (var scheduleDate in schedule)
@@ -39,8 +39,25 @@ public class SchedulesJob : WelcomesJob
             msg.AppendLine($"Расписание на {scheduleDate.Date}");
             foreach (var lesson in scheduleDate.Lessons)
             {
-                msg.AppendLine($"# {lesson.Num} - {lesson.Title} ауд. № {lesson.Cab}");
+                msg.AppendLine($"# {lesson.NumPair}.{lesson.NumLesson} - {lesson.SubjectDetails.SubjectName} ({lesson.Identity.FirstOrDefault()?.Name}) ауд. № {lesson.Cabs.FirstOrDefault()?.Adress}");
             }
+        }
+
+        return Task.FromResult(msg.ToString());
+    }
+    
+    private Task<string> BuilerStringShedule(IResultOutScheduleFromDate? schedule)
+    {
+        if (schedule is null || schedule.Lessons.Count() is 0)
+            return Task.FromResult($"Не удалось получить расписание. {new Random().Next()}");
+            
+        var msg = new StringBuilder();
+
+        msg.AppendLine($"Расписание на {schedule.Date}");
+        
+        foreach (var lesson in schedule.Lessons)
+        {
+            msg.AppendLine($"# {lesson.NumPair}.{lesson.NumLesson} - {lesson.SubjectDetails.SubjectName} ({lesson.Identity.FirstOrDefault()?.Name}) ауд. № {lesson.Cabs.FirstOrDefault()?.Adress}");
         }
 
         return Task.FromResult(msg.ToString());
