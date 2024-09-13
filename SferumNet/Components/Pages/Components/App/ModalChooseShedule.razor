@@ -76,16 +76,13 @@
 
     private async Task LoadValuesAsync(ScheduleSearchType selected)
     {
-        if (selected is ScheduleSearchType.Cab)
-            _values = new List<object>((await _samgk.Cabs.GetCabsAsync()));
-
-        if (selected is ScheduleSearchType.Group)
-            _values = new List<object>((await _samgk.Groups.GetGroupsAsync()));
-
-        if (selected is ScheduleSearchType.Employee)
-            _values = new List<object>((await _samgk.Accounts.GetTeachersAsync()));
-
-        await InvokeAsync(StateHasChanged);
+        _values = selected switch
+        {
+            ScheduleSearchType.Cab => new List<object>((await _samgk.Cabs.GetCabsAsync())),
+            ScheduleSearchType.Group => new List<object>((await _samgk.Groups.GetGroupsAsync())),
+            ScheduleSearchType.Employee => new List<object>((await _samgk.Accounts.GetTeachersAsync())),
+            _ => _values
+        };
     }
 
     private void Select()
