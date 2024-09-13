@@ -27,11 +27,8 @@ public class SchedulesJob : WelcomesJob
     }
     
     
-    private Task<string> BuilerStringShedule(IResultOutScheduleFromDate? schedule)
+    private Task<string> BuilerStringShedule(IResultOutScheduleFromDate schedule)
     {
-        if (schedule is null || schedule.Lessons.Count() is 0)
-            return Task.FromResult($"Не удалось получить расписание. {new Random().Next()}");
-            
         var msg = new StringBuilder();
 
         msg.AppendLine($"Расписание на {schedule.Date}");
@@ -47,6 +44,11 @@ public class SchedulesJob : WelcomesJob
             msg.AppendLine($"{GetPrepareStringTeacher(lesson.Identity.First().Name)}");
             msg.AppendLine($"Каб: {lesson.Cabs.FirstOrDefault()?.Adress} • {lesson.EducationGroup.Name}");
         }
+
+        if (schedule.Lessons.Count is not 0) return Task.FromResult(msg.ToString());
+        
+        msg.AppendLine($"=====================");
+        msg.AppendLine($"Пустой ответ");
 
         return Task.FromResult(msg.ToString());
     }

@@ -70,20 +70,20 @@
 
     protected override Task OnInitializedAsync()
     {
-        //SheduleType = ScheduleSearchType.Group;
+        SheduleType = ScheduleSearchType.Group;
         return Task.CompletedTask;
     }
 
     private async Task LoadValuesAsync(ScheduleSearchType selected)
     {
         if (selected is ScheduleSearchType.Cab)
-            _values = new List<object>((_samgk.Cabs.GetCabs()));
+            _values = new List<object>((await _samgk.Cabs.GetCabsAsync()));
 
         if (selected is ScheduleSearchType.Group)
-            _values = new List<object>((_samgk.Groups.GetGroups()));
+            _values = new List<object>((await _samgk.Groups.GetGroupsAsync()));
 
         if (selected is ScheduleSearchType.Employee)
-            _values = new List<object>((_samgk.Accounts.GetTeachers()));
+            _values = new List<object>((await _samgk.Accounts.GetTeachersAsync()));
 
         await InvokeAsync(StateHasChanged);
     }
