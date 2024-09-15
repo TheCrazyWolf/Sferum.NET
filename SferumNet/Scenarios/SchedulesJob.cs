@@ -19,10 +19,10 @@ public class SchedulesJob : WelcomesJob
             return $"Не удалось получить расписание. {new Random().Next()}";
 
         if (upCasted.IsAddedNextDay)
-            return await BuilerStringShedule(await _samgk.Sсhedule
+            return await BuilerStringShedule(await _samgk.Schedule
                 .GetScheduleAsync(DateOnly.FromDateTime(DateTime.Now.AddDays(1)), upCasted.TypeSchedule, upCasted.Value));
         
-        return await BuilerStringShedule(await _samgk.Sсhedule
+        return await BuilerStringShedule(await _samgk.Schedule
             .GetScheduleAsync(DateOnly.FromDateTime(DateTime.Now), upCasted.TypeSchedule, upCasted.Value));
     }
     
@@ -33,15 +33,12 @@ public class SchedulesJob : WelcomesJob
 
         msg.AppendLine($"Расписание на {schedule.Date}");
         
-        foreach (var lesson in schedule.Lessons
-                     .GroupBy(l => new { l.NumPair, l.NumLesson, l.SubjectDetails.SubjectName})
-                     .Select(g => g.First())
-                     .ToList())
+        foreach (var lesson in schedule.Lessons)
         {
             msg.AppendLine($"=====================");
             msg.AppendLine($"{lesson.NumPair}.{lesson.NumLesson}");
             msg.AppendLine($"{GetShortDiscipline(lesson.SubjectDetails.SubjectName)}");
-            msg.AppendLine($"{GetPrepareStringTeacher(lesson.Identity.First().Name)}");
+            msg.AppendLine($"{lesson.Identity.First().GetShortName()}");
             msg.AppendLine($"Каб: {lesson.Cabs.FirstOrDefault()?.Adress} • {lesson.EducationGroup.Name}");
         }
 
@@ -51,19 +48,6 @@ public class SchedulesJob : WelcomesJob
         msg.AppendLine($"Пустой ответ");
 
         return Task.FromResult(msg.ToString());
-    }
-
-    private string GetPrepareStringTeacher(string teacherName)
-    {
-        teacherName = teacherName.Replace("  ", string.Empty)
-            .Replace("  ", string.Empty);
-        
-        var arraysTeacherName = teacherName.Split(' ');
-
-        if (arraysTeacherName.Length == 3)
-            return $"{arraysTeacherName[0]} {arraysTeacherName[1].FirstOrDefault()}. {arraysTeacherName[2].FirstOrDefault()}.";
-
-        return teacherName;
     }
 
     private string GetShortDiscipline(string disciplineName)
