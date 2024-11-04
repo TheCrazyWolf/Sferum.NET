@@ -4,6 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
 
@@ -38,6 +39,13 @@
       <None Include="wwwroot\Source\AuthRemix\SF2.png" />
       <None Include="wwwroot\Source\AuthRemix\SF3.png" />
       <None Include="wwwroot\Source\AuthRemix\SF4.png" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
