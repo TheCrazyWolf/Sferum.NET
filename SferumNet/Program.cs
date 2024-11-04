@@ -1,6 +1,6 @@
+using System.Net;
 using SferumNet.Components;
 using MudBlazor.Services;
-using SferumNet;
 using SferumNet.Database;
 using SferumNet.Services;
 using SferumNet.Services.Common;
@@ -16,8 +16,10 @@ builder.Services.AddTransient<SferumNetContext>();
 builder.Services.AddScoped<DbLogger>();
 builder.Services.AddSingleton<IScenarioConfigurator, ScenarioConfigurator>();
 
-builder.WebHost.ConfigureKestrel(
-    options => options.ListenAnyIP(85));
+builder.WebHost.ConfigureKestrel((httpClient, options) =>
+{
+    options.Listen(IPAddress.Any, 5001);
+});
 
 var app = builder.Build();
 
