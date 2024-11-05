@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using SferumNet.Components;
 using MudBlazor.Services;
@@ -6,7 +7,9 @@ using SferumNet.Services;
 using SferumNet.Services.Common;
 
 var builder = WebApplication.CreateBuilder(args);
-
+CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
+CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture("ru-RU");
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
