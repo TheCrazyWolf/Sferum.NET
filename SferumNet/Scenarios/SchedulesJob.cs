@@ -38,7 +38,7 @@ public class SchedulesJob : WelcomesJob
             msg.AppendLine($"=====================");
             msg.AppendLine($"{lesson.NumPair}.{lesson.NumLesson}");
             msg.AppendLine($"{GetShortDiscipline(lesson.SubjectDetails.SubjectName)}");
-            msg.AppendLine($"{lesson.Identity.First().GetShortName()}");
+            msg.AppendLine($"{lesson.Identity.First().ShortName}");
             msg.AppendLine($"Каб: {lesson.Cabs.FirstOrDefault()?.Adress} • {lesson.EducationGroup.Name}");
         }
 
