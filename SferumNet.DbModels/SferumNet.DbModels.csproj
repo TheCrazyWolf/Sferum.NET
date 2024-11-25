@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="ClientSamgk" Version="2.5.2" />
+      <PackageReference Include="ClientSamgk" Version="2.6.1" />
     </ItemGroup>
 
 </Project>
